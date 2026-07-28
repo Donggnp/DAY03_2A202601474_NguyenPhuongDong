@@ -1,0 +1,53 @@
+[
+    {
+        "name": "Đại học Bách Khoa Hà Nội",
+        "region": "Miền Bắc",
+        "majors": [
+            "CNTT",
+            "Kỹ thuật",
+            "Cơ điện tử"
+        ],
+        "tuition_year": 30000000
+    },
+    {
+        "name": "Đại học Kinh tế Quốc dân",
+        "region": "Miền Bắc",
+        "majors": [
+            "Kinh tế",
+            "Marketing",
+            "Kế toán"
+        ],
+        "tuition_year": 25000000
+    },
+    {
+        "name": "Đại học FPT",
+        "region": "Toàn quốc",
+        "majors": [
+            "CNTT",
+            "Marketing",
+            "Ngôn ngữ"
+        ],
+        "tuition_year": 90000000
+    },
+    {
+        "name": "Đại học Khoa học Tự nhiên TP.HCM",
+        "region": "Miền Nam",
+        "majors": [
+            "CNTT",
+            "Khoa học dữ liệu",
+            "Sinh học"
+        ],
+        "tuition_year": 28000000
+    },
+    {
+        "name": "RMIT Việt Nam",
+        "region": "Toàn quốc",
+        "majors": [
+            "Kinh tế",
+            "Truyền thông",
+            "IT",
+            "Marketing"
+        ],
+        "tuition_year": 320000000
+    }
+]
