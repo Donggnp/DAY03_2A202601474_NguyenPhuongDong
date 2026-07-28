@@ -30,3 +30,67 @@
     "expected_behavior": "Tool báo lỗi tham số/thất bại, Guardrail ngắt sau 3 bước và trả về thông báo lịch sự."
   }
 ]
+# Tổng kết & Thiết kế Use Case
+
+Trước khi đi vào Use Case chi tiết, mình tổng kết lại nhanh các quyết định đã thống nhất qua buổi thảo luận để đảm bảo đúng hướng.
+
+## Tóm tắt các quyết định chính
+
+**Đề tài:** Chatbot Định Hướng Sự Nghiệp
+
+**Đối tượng người dùng (Persona xác định):** Học sinh lớp 12, ở giai đoạn **trước khi thi Đánh giá năng lực (ĐGNL)** — chưa có điểm số, cần định hướng ngành + khối thi trước.
+
+**Chiến lược tiêu chí đã thống nhất (phân theo vai trò):**
+
+| Vai trò | Tiêu chí |
+|---|---|
+| **Chính** (quyết định kết quả) | Tính cách, RIASEC (sở thích nghề nghiệp), Thế mạnh học tập theo môn, **Xu hướng ngành nghề (VN + thế giới)** |
+| **Phụ** (gợi mở, tạo trải nghiệm) | Số chủ đạo (thần số học) |
+| **Ngữ cảnh** (cá nhân hóa) | Tổ hợp môn đang học, kỳ vọng gia đình, ràng buộc tài chính/địa lý, mức độ rõ ràng định hướng hiện tại |
+
+**Giá trị cốt lõi của sản phẩm:** Không chỉ gợi ý "nghề phù hợp" mà giải quyết trọn gói bài toán *chọn ngành – chọn khối thi – chọn trường*, đúng thời điểm học sinh cần quyết định nhất.
+
+Giờ mình triển khai thành Use Case cụ thể.## Đặc tả Use Case: UC-01 — Nhận gợi ý định hướng ngành nghề
+
+**Tên Use Case:** Học sinh nhận gợi ý ngành nghề, khối thi và lộ trình ôn thi ĐGNL
+
+**Actor chính:** Học sinh lớp 12 (chưa thi ĐGNL)
+
+**Actor phụ:** Hệ thống dữ liệu xu hướng ngành nghề (nguồn cập nhật định kỳ)
+
+**Mục tiêu:** Học sinh xác định được ngành học phù hợp với bản thân và có căn cứ thực tế (xu hướng thị trường), kèm khối thi/tổ hợp môn tương ứng.
+
+**Điều kiện tiên quyết (Precondition):**
+- Học sinh đã truy cập chatbot, chưa có kết quả thi ĐGNL
+- Hệ thống đã có sẵn dữ liệu xu hướng ngành nghề và dữ liệu điểm chuẩn tham khảo năm gần nhất
+
+**Luồng chính (Main flow):**
+1. Học sinh bắt đầu hội thoại với chatbot
+2. Chatbot hỏi ngày sinh → tính số chủ đạo, dùng để mở đầu hội thoại tạo hứng thú (không tính điểm vào kết quả)
+3. Chatbot đưa ra bộ câu hỏi trắc nghiệm tính cách + RIASEC
+4. Chatbot hỏi học sinh tự đánh giá thế mạnh theo từng môn học (hoặc nhập điểm trung bình)
+5. Chatbot thu thập thông tin ngữ cảnh: tổ hợp môn đang học, điều kiện tài chính/địa lý, kỳ vọng gia đình, mức độ đã có định hướng hay chưa
+6. Hệ thống đối chiếu toàn bộ dữ liệu với cơ sở dữ liệu xu hướng ngành nghề (VN ưu tiên, thế giới tham khảo)
+7. Chatbot trả về: Top 3-5 ngành phù hợp, khối thi/tổ hợp môn tương ứng, trường tham khảo, lộ trình ôn thi ĐGNL ưu tiên
+8. Học sinh có thể lưu lại hoặc chia sẻ kết quả
+
+**Luồng thay thế (Alternative flows):**
+- **A1 — Học sinh chưa có tổ hợp môn cố định:** chatbot gợi ý các tổ hợp phù hợp dựa trên thế mạnh môn học, thay vì yêu cầu bắt buộc
+- **A2 — Học sinh muốn xem lại/làm lại trắc nghiệm:** cho phép quay lại bước 3 hoặc 4 mà không mất dữ liệu ngữ cảnh đã nhập
+
+**Luồng ngoại lệ (Exception flows):**
+- **E1 — Dữ liệu xu hướng ngành nghề chưa cập nhật:** hệ thống cảnh báo kết quả có thể chưa phản ánh xu hướng mới nhất, đề xuất mốc cập nhật gần nhất
+- **E2 — Học sinh bỏ dở giữa chừng:** hệ thống lưu tiến trình, cho phép tiếp tục ở lần truy cập sau
+
+**Hậu điều kiện (Postcondition):** Học sinh có một bản gợi ý ngành nghề cá nhân hóa, có thể dùng làm căn cứ đăng ký nguyện vọng/ôn thi.
+
+**Business rule đáng chú ý:**
+- Số chủ đạo không được có trọng số trong công thức tính điểm cuối, chỉ dùng để cá nhân hóa trải nghiệm mở đầu
+- Trọng số gợi ý nên nghiêng về Tính cách + RIASEC + Xu hướng ngành nghề nhiều hơn so với thế mạnh học tập đơn thuần, vì đây là giai đoạn định hướng chứ chưa phải xét tuyển
+
+---
+
+Bạn muốn mình tiếp tục với:
+- **Đặc tả Use Case phụ** (VD: UC-02 Học sinh cập nhật lại thông tin, UC-03 Admin cập nhật dữ liệu xu hướng ngành nghề)
+- **Ma trận trọng số scoring** cụ thể cho từng tiêu chí
+- Xuất toàn bộ nội dung trên thành **file Word/tài liệu BA** để bạn lưu và trình bày
