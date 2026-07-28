@@ -101,3 +101,16 @@ Bạn muốn mình tiếp tục với:
 Holland Code (RIASEC)
 Định hướng nghề nghiệp
 6 nhóm
+
+
+Bảng tổng hợp Input
+#	Input đầu vào	Vai trò	Cách thu thập	Mục đích sử dụng
+1	RIASEC (Holland Code)	Chính	Bộ câu hỏi trắc nghiệm tự thiết kế (36-60 câu, 6 nhóm)	Xác định mã 2-3 chữ cái → nhóm ngành phù hợp sở thích
+2	Tính cách	Chính	Trắc nghiệm (MBTI rút gọn hoặc Big Five)	Bổ trợ RIASEC, làm rõ phong cách làm việc/môi trường phù hợp
+3	Thế mạnh học tập theo môn	Chính	Tự đánh giá hoặc nhập điểm trung bình các môn	Đối chiếu năng lực thực tế với ngành đã lọc từ RIASEC
+4	Xu hướng ngành nghề (VN + thế giới)	Chính	Dữ liệu hệ thống thu thập/cập nhật định kỳ (không phải học sinh nhập)	Lọc/xếp hạng lại nhóm ngành theo triển vọng thực tế
+5	Tổ hợp môn đang học	Ngữ cảnh	Học sinh nhập (hoặc để trống nếu chưa cố định)	Giới hạn/gợi ý khối thi phù hợp với ngành đã chọn
+6	Điều kiện tài chính & khu vực gia đình	Ngữ cảnh	Học sinh nhập (mức độ chấp nhận được, không cần số liệu chính xác)	Điều chỉnh gợi ý trường/ngành cho khả thi
+7	Kỳ vọng của gia đình	Ngữ cảnh	Học sinh nhập	Giúp chatbot cân bằng giữa sở thích cá nhân và áp lực gia đình khi tư vấn
+8	Mức độ đã có định hướng	Ngữ cảnh	Học sinh nhập (đã rõ ràng / còn mơ hồ / chưa biết gì)	Điều chỉnh độ sâu/rộng của phần tư vấn
+9	Số chủ đạo (thần số học)	Phụ	Ngày sinh → hệ thống tự tính	Tạo trải nghiệm mở đầu, không tính vào điểm số quyết định
