@@ -1,116 +1,936 @@
-[
-  {
-    "id": 1,
-    "category": "🟢 Đơn giản (Chỉ cần LLM)",
-    "question": "Thủ đô của Việt Nam là gì?",
-    "expected_behavior": "Chatbot trả lời trực tiếp từ kiến thức có sẵn."
-  },
-  {
-    "id": 2,
-    "category": "🟢 Đơn giản (Chỉ cần LLM)",
-    "question": "Nêu 3 lời khuyên để học tốt lập trình.",
-    "expected_behavior": "Chatbot trả lời trực tiếp từ kiến thức có sẵn."
-  },
-  {
-    "id": 3,
-    "category": "🟡 Multi-step (Cần Tool)",
-    "question": "Thời tiết ở Hà Nội hôm nay thế nào và tôi nên mặc gì đi chơi?",
-    "expected_behavior": "Agent gọi tool get_weather('Hà Nội') rồi suy luận trang phục."
-  },
-  {
-    "id": 4,
-    "category": "🟡 Multi-step (Cần gọi 2 Tools)",
-    "question": "Kiểm tra vé máy bay từ TP.HCM đi Hà Nội ngày mai và dự báo thời tiết ở Hà Nội.",
-    "expected_behavior": "Agent gọi tool search_flights và get_weather để trả lời đầy đủ."
-  },
-  {
-    "id": 5,
-    "category": "🔴 Edge Case (Bẫy Guardrail)",
-    "question": "Tra cứu thời tiết ở thành phố Atlantis ngày 32/13/2026.",
-    "expected_behavior": "Tool báo lỗi tham số/thất bại, Guardrail ngắt sau 3 bước và trả về thông báo lịch sự."
-  }
-]
-# Tổng kết & Thiết kế Use Case
-
-Trước khi đi vào Use Case chi tiết, mình tổng kết lại nhanh các quyết định đã thống nhất qua buổi thảo luận để đảm bảo đúng hướng.
-
-## Tóm tắt các quyết định chính
-
-**Đề tài:** Chatbot Định Hướng Sự Nghiệp
-
-**Đối tượng người dùng (Persona xác định):** Học sinh lớp 12, ở giai đoạn **trước khi thi Đánh giá năng lực (ĐGNL)** — chưa có điểm số, cần định hướng ngành + khối thi trước.
-
-**Chiến lược tiêu chí đã thống nhất (phân theo vai trò):**
-
-| Vai trò | Tiêu chí |
-|---|---|
-| **Chính** (quyết định kết quả) | Tính cách, RIASEC (sở thích nghề nghiệp), Thế mạnh học tập theo môn, **Xu hướng ngành nghề (VN + thế giới)** |
-| **Phụ** (gợi mở, tạo trải nghiệm) | Số chủ đạo (thần số học) |
-| **Ngữ cảnh** (cá nhân hóa) | Tổ hợp môn đang học, kỳ vọng gia đình, ràng buộc tài chính/địa lý, mức độ rõ ràng định hướng hiện tại |
-
-**Giá trị cốt lõi của sản phẩm:** Không chỉ gợi ý "nghề phù hợp" mà giải quyết trọn gói bài toán *chọn ngành – chọn khối thi – chọn trường*, đúng thời điểm học sinh cần quyết định nhất.
-
-Giờ mình triển khai thành Use Case cụ thể.## Đặc tả Use Case: UC-01 — Nhận gợi ý định hướng ngành nghề
-
-**Tên Use Case:** Học sinh nhận gợi ý ngành nghề, khối thi và lộ trình ôn thi ĐGNL
-
-**Actor chính:** Học sinh lớp 12 (chưa thi ĐGNL)
-
-**Actor phụ:** Hệ thống dữ liệu xu hướng ngành nghề (nguồn cập nhật định kỳ)
-
-**Mục tiêu:** Học sinh xác định được ngành học phù hợp với bản thân và có căn cứ thực tế (xu hướng thị trường), kèm khối thi/tổ hợp môn tương ứng.
-
-**Điều kiện tiên quyết (Precondition):**
-- Học sinh đã truy cập chatbot, chưa có kết quả thi ĐGNL
-- Hệ thống đã có sẵn dữ liệu xu hướng ngành nghề và dữ liệu điểm chuẩn tham khảo năm gần nhất
-
-**Luồng chính (Main flow):**
-1. Học sinh bắt đầu hội thoại với chatbot
-2. Chatbot hỏi ngày sinh → tính số chủ đạo, dùng để mở đầu hội thoại tạo hứng thú (không tính điểm vào kết quả)
-3. Chatbot đưa ra bộ câu hỏi trắc nghiệm tính cách + RIASEC
-4. Chatbot hỏi học sinh tự đánh giá thế mạnh theo từng môn học (hoặc nhập điểm trung bình)
-5. Chatbot thu thập thông tin ngữ cảnh: tổ hợp môn đang học, điều kiện tài chính/địa lý, kỳ vọng gia đình, mức độ đã có định hướng hay chưa
-6. Hệ thống đối chiếu toàn bộ dữ liệu với cơ sở dữ liệu xu hướng ngành nghề (VN ưu tiên, thế giới tham khảo)
-7. Chatbot trả về: Top 3-5 ngành phù hợp, khối thi/tổ hợp môn tương ứng, trường tham khảo, lộ trình ôn thi ĐGNL ưu tiên
-8. Học sinh có thể lưu lại hoặc chia sẻ kết quả
-
-**Luồng thay thế (Alternative flows):**
-- **A1 — Học sinh chưa có tổ hợp môn cố định:** chatbot gợi ý các tổ hợp phù hợp dựa trên thế mạnh môn học, thay vì yêu cầu bắt buộc
-- **A2 — Học sinh muốn xem lại/làm lại trắc nghiệm:** cho phép quay lại bước 3 hoặc 4 mà không mất dữ liệu ngữ cảnh đã nhập
-
-**Luồng ngoại lệ (Exception flows):**
-- **E1 — Dữ liệu xu hướng ngành nghề chưa cập nhật:** hệ thống cảnh báo kết quả có thể chưa phản ánh xu hướng mới nhất, đề xuất mốc cập nhật gần nhất
-- **E2 — Học sinh bỏ dở giữa chừng:** hệ thống lưu tiến trình, cho phép tiếp tục ở lần truy cập sau
-
-**Hậu điều kiện (Postcondition):** Học sinh có một bản gợi ý ngành nghề cá nhân hóa, có thể dùng làm căn cứ đăng ký nguyện vọng/ôn thi.
-
-**Business rule đáng chú ý:**
-- Số chủ đạo không được có trọng số trong công thức tính điểm cuối, chỉ dùng để cá nhân hóa trải nghiệm mở đầu
-- Trọng số gợi ý nên nghiêng về Tính cách + RIASEC + Xu hướng ngành nghề nhiều hơn so với thế mạnh học tập đơn thuần, vì đây là giai đoạn định hướng chứ chưa phải xét tuyển
-
----
-
-Bạn muốn mình tiếp tục với:
-- **Đặc tả Use Case phụ** (VD: UC-02 Học sinh cập nhật lại thông tin, UC-03 Admin cập nhật dữ liệu xu hướng ngành nghề)
-- **Ma trận trọng số scoring** cụ thể cho từng tiêu chí
-- Xuất toàn bộ nội dung trên thành **file Word/tài liệu BA** để bạn lưu và trình bày
-
-
-
-
-Holland Code (RIASEC)
-Định hướng nghề nghiệp
-6 nhóm
-
-
-Bảng tổng hợp Input
-#	Input đầu vào	Vai trò	Cách thu thập	Mục đích sử dụng
-1	RIASEC (Holland Code)	Chính	Bộ câu hỏi trắc nghiệm tự thiết kế (36-60 câu, 6 nhóm)	Xác định mã 2-3 chữ cái → nhóm ngành phù hợp sở thích
-2	Tính cách	Chính	Trắc nghiệm (MBTI rút gọn hoặc Big Five)	Bổ trợ RIASEC, làm rõ phong cách làm việc/môi trường phù hợp
-3	Thế mạnh học tập theo môn	Chính	Tự đánh giá hoặc nhập điểm trung bình các môn	Đối chiếu năng lực thực tế với ngành đã lọc từ RIASEC
-4	Xu hướng ngành nghề (VN + thế giới)	Chính	Dữ liệu hệ thống thu thập/cập nhật định kỳ (không phải học sinh nhập)	Lọc/xếp hạng lại nhóm ngành theo triển vọng thực tế
-5	Tổ hợp môn đang học	Ngữ cảnh	Học sinh nhập (hoặc để trống nếu chưa cố định)	Giới hạn/gợi ý khối thi phù hợp với ngành đã chọn
-6	Điều kiện tài chính & khu vực gia đình	Ngữ cảnh	Học sinh nhập (mức độ chấp nhận được, không cần số liệu chính xác)	Điều chỉnh gợi ý trường/ngành cho khả thi
-7	Kỳ vọng của gia đình	Ngữ cảnh	Học sinh nhập	Giúp chatbot cân bằng giữa sở thích cá nhân và áp lực gia đình khi tư vấn
-8	Mức độ đã có định hướng	Ngữ cảnh	Học sinh nhập (đã rõ ràng / còn mơ hồ / chưa biết gì)	Điều chỉnh độ sâu/rộng của phần tư vấn
-9	Số chủ đạo (thần số học)	Phụ	Ngày sinh → hệ thống tự tính	Tạo trải nghiệm mở đầu, không tính vào điểm số quyết định
+{
+  "project": "Chatbot Định Hướng Sự Nghiệp",
+  "target_user": "Học sinh lớp 12 (trước kỳ thi Đánh giá năng lực)",
+  "total_test_cases": 59,
+  "test_cases": [
+    {
+      "test_case_id": "TC-001",
+      "module": "01. Nhập ngày sinh & Số chủ đạo",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Nhập ngày sinh hợp lệ, hệ thống tính đúng số chủ đạo",
+      "precondition": "Học sinh đã mở chatbot, đang ở bước đầu tiên",
+      "test_data": "Ngày sinh: 15/08/2007",
+      "steps": [
+        "1. Học sinh nhập ngày sinh theo định dạng yêu cầu",
+        "2. Nhấn xác nhận"
+      ],
+      "expected_result": "Hệ thống tính đúng số chủ đạo và hiển thị một câu gợi mở ngắn gọn mang tính tham khảo, không ảnh hưởng điểm số",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-002",
+      "module": "01. Nhập ngày sinh & Số chủ đạo",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Cao",
+      "scenario": "Nhập ngày sinh sai định dạng",
+      "precondition": "Học sinh đang ở bước nhập ngày sinh",
+      "test_data": "Ngày sinh: 32/13/2007 (ngày/tháng không hợp lệ)",
+      "steps": [
+        "1. Học sinh nhập ngày sinh sai định dạng",
+        "2. Nhấn xác nhận"
+      ],
+      "expected_result": "Hệ thống báo lỗi rõ ràng, yêu cầu nhập lại, không cho qua bước tiếp theo",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-003",
+      "module": "01. Nhập ngày sinh & Số chủ đạo",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Bỏ trống ngày sinh",
+      "precondition": "Học sinh đang ở bước nhập ngày sinh",
+      "test_data": "Trường ngày sinh để trống",
+      "steps": [
+        "1. Học sinh không nhập gì",
+        "2. Nhấn xác nhận / tiếp tục"
+      ],
+      "expected_result": "Hệ thống nhắc nhập bắt buộc hoặc cho phép bỏ qua với cảnh báo 'sẽ không hiển thị phần gợi mở số chủ đạo'",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-004",
+      "module": "01. Nhập ngày sinh & Số chủ đạo",
+      "test_type": "Chức năng",
+      "priority": "Thấp",
+      "scenario": "Kiểm tra số chủ đạo không được tính vào công thức điểm cuối",
+      "precondition": "Đã hoàn tất toàn bộ luồng nhập liệu và nhận kết quả",
+      "test_data": "Bộ dữ liệu mẫu với 2 học sinh giống hệt nhau về RIASEC/tính cách/học lực nhưng khác ngày sinh",
+      "steps": [
+        "1. Chạy 2 hồ sơ với toàn bộ input giống nhau, chỉ khác ngày sinh",
+        "2. So sánh kết quả gợi ý ngành nghề"
+      ],
+      "expected_result": "Kết quả gợi ý ngành nghề (Top 3-5 ngành) của 2 hồ sơ phải giống nhau hoàn toàn, chỉ khác câu gợi mở số chủ đạo",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-005",
+      "module": "02. Trắc nghiệm Tính cách & RIASEC",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Hoàn thành đầy đủ bộ câu hỏi RIASEC và nhận điểm 6 nhóm",
+      "precondition": "Học sinh đã qua bước nhập ngày sinh",
+      "test_data": "Trả lời đầy đủ 36-60 câu hỏi theo thang đo 1-5",
+      "steps": [
+        "1. Học sinh trả lời lần lượt từng câu hỏi",
+        "2. Hoàn tất toàn bộ bộ câu hỏi"
+      ],
+      "expected_result": "Hệ thống tính điểm cho đủ 6 nhóm R-I-A-S-E-C, chuẩn hóa về thang %, xác định mã 2-3 chữ cái nổi bật nhất",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-006",
+      "module": "02. Trắc nghiệm Tính cách & RIASEC",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Cao",
+      "scenario": "Học sinh bỏ dở giữa chừng bộ câu hỏi",
+      "precondition": "Học sinh đang làm trắc nghiệm RIASEC, đã trả lời 50%",
+      "test_data": "Thoát ứng dụng/mất kết nối khi đang làm dở",
+      "steps": [
+        "1. Học sinh trả lời một số câu hỏi",
+        "2. Đóng chatbot hoặc mất mạng",
+        "3. Quay lại chatbot sau đó"
+      ],
+      "expected_result": "Hệ thống lưu tiến trình đã làm, cho phép tiếp tục từ câu hỏi còn dang dở, không mất dữ liệu đã trả lời",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-007",
+      "module": "02. Trắc nghiệm Tính cách & RIASEC",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh trả lời tất cả các câu hỏi giống nhau (mức trung lập)",
+      "precondition": "Học sinh đang làm trắc nghiệm",
+      "test_data": "Tất cả câu trả lời đều chọn mức 3/5 (trung lập)",
+      "steps": [
+        "1. Học sinh chọn mức trung lập cho toàn bộ câu hỏi",
+        "2. Hoàn tất bài test"
+      ],
+      "expected_result": "Hệ thống vẫn tính ra kết quả nhưng có thể hiển thị cảnh báo 'kết quả chưa thực sự rõ nét, học sinh nên trả lời trung thực hơn' hoặc gợi ý làm lại",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-008",
+      "module": "02. Trắc nghiệm Tính cách & RIASEC",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Xác định đúng mã RIASEC khi có nhiều nhóm điểm bằng nhau",
+      "precondition": "Học sinh đã hoàn tất bài test với kết quả có 2 nhóm điểm bằng nhau (VD: R=I=80%)",
+      "test_data": "Bộ trả lời mẫu cho kết quả hòa điểm giữa 2 nhóm",
+      "steps": [
+        "1. Chạy engine tính điểm với bộ dữ liệu mẫu gây hòa điểm",
+        "2. Kiểm tra mã RIASEC được xác định"
+      ],
+      "expected_result": "Hệ thống có quy tắc xử lý hòa điểm rõ ràng (VD: ưu tiên theo thứ tự lục giác Holland hoặc lấy cả 2 nhóm vào mã 3 chữ cái), không bị lỗi hoặc treo",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-009",
+      "module": "02. Trắc nghiệm Tính cách & RIASEC",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Hoàn thành trắc nghiệm tính cách (MBTI/Big Five) sau RIASEC",
+      "precondition": "Học sinh đã hoàn tất RIASEC",
+      "test_data": "Trả lời đầy đủ bộ câu hỏi tính cách",
+      "steps": [
+        "1. Học sinh làm tiếp bộ câu hỏi tính cách",
+        "2. Hoàn tất"
+      ],
+      "expected_result": "Hệ thống trả về nhóm tính cách tương ứng, lưu kèm với kết quả RIASEC đã có trước đó, không ghi đè",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-010",
+      "module": "02. Trắc nghiệm Tính cách & RIASEC",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Học sinh muốn làm lại bài trắc nghiệm RIASEC",
+      "precondition": "Học sinh đã hoàn tất bài test RIASEC trước đó",
+      "test_data": "Yêu cầu 'làm lại trắc nghiệm'",
+      "steps": [
+        "1. Học sinh chọn chức năng làm lại",
+        "2. Xác nhận muốn làm lại"
+      ],
+      "expected_result": "Hệ thống cho phép làm lại từ đầu, dữ liệu ngữ cảnh (tổ hợp môn, tài chính...) đã nhập trước đó không bị mất",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-011",
+      "module": "02. Trắc nghiệm Tính cách & RIASEC",
+      "test_type": "Bảo mật",
+      "priority": "Trung bình",
+      "scenario": "Học sinh cố ý gửi dữ liệu không hợp lệ vào API trắc nghiệm (không qua giao diện)",
+      "precondition": "Có quyền truy cập API endpoint của bài test",
+      "test_data": "Payload chứa giá trị điểm nằm ngoài thang đo (VD: 999) hoặc ký tự lạ",
+      "steps": [
+        "1. Gửi request trực tiếp tới API với dữ liệu bất thường"
+      ],
+      "expected_result": "Hệ thống validate và từ chối dữ liệu không hợp lệ, trả về mã lỗi rõ ràng, không làm sai lệch điểm số hoặc crash hệ thống",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-012",
+      "module": "03. Đánh giá thế mạnh học tập",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Nhập điểm trung bình các môn hợp lệ",
+      "precondition": "Học sinh đã hoàn tất trắc nghiệm tính cách/RIASEC",
+      "test_data": "Điểm TB: Toán 8.5, Văn 7.0, Anh 8.0, Lý 7.5, Hóa 6.5",
+      "steps": [
+        "1. Học sinh nhập điểm từng môn",
+        "2. Xác nhận"
+      ],
+      "expected_result": "Hệ thống lưu đúng dữ liệu, xác định được 2-3 môn thế mạnh nổi bật nhất để đưa vào bước đối chiếu tiếp theo",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-013",
+      "module": "03. Đánh giá thế mạnh học tập",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Cao",
+      "scenario": "Nhập điểm ngoài thang điểm cho phép",
+      "precondition": "Học sinh đang ở bước nhập điểm",
+      "test_data": "Điểm nhập: 15 (thang điểm 10)",
+      "steps": [
+        "1. Học sinh nhập điểm không hợp lệ",
+        "2. Nhấn xác nhận"
+      ],
+      "expected_result": "Hệ thống báo lỗi, yêu cầu nhập lại trong khoảng cho phép (0-10), không lưu giá trị sai",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-014",
+      "module": "03. Đánh giá thế mạnh học tập",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh chọn tự đánh giá định tính thay vì nhập điểm số",
+      "precondition": "Học sinh không muốn/không nhớ điểm chính xác",
+      "test_data": "Chọn mức 'Giỏi/Khá/Trung bình' cho từng môn",
+      "steps": [
+        "1. Học sinh chọn phương thức đánh giá định tính",
+        "2. Chọn mức độ cho từng môn"
+      ],
+      "expected_result": "Hệ thống chấp nhận input định tính, quy đổi tương đương để đưa vào công thức tính điểm chung",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-015",
+      "module": "03. Đánh giá thế mạnh học tập",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Học sinh bỏ trống một số môn học",
+      "precondition": "Học sinh đang nhập điểm các môn",
+      "test_data": "Chỉ nhập điểm 3/9 môn, bỏ trống các môn còn lại",
+      "steps": [
+        "1. Học sinh chỉ nhập một phần dữ liệu",
+        "2. Nhấn tiếp tục"
+      ],
+      "expected_result": "Hệ thống cho phép tiếp tục với dữ liệu chưa đầy đủ nhưng cảnh báo kết quả có thể kém chính xác hơn nếu bổ sung thêm điểm",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-016",
+      "module": "04. Thông tin ngữ cảnh",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Nhập tổ hợp môn đang học hợp lệ",
+      "precondition": "Học sinh đã hoàn tất các bước trắc nghiệm và điểm học tập",
+      "test_data": "Tổ hợp: A00 (Toán - Lý - Hóa)",
+      "steps": [
+        "1. Học sinh chọn tổ hợp môn từ danh sách có sẵn",
+        "2. Xác nhận"
+      ],
+      "expected_result": "Hệ thống lưu đúng tổ hợp môn, dùng để giới hạn/gợi ý ngành và trường phù hợp ở bước sau",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-017",
+      "module": "04. Thông tin ngữ cảnh",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh chưa có tổ hợp môn cố định",
+      "precondition": "Học sinh đang ở bước chọn tổ hợp môn",
+      "test_data": "Chọn tùy chọn 'Chưa xác định / chưa chọn khối'",
+      "steps": [
+        "1. Học sinh chọn 'chưa xác định'",
+        "2. Tiếp tục"
+      ],
+      "expected_result": "Hệ thống chuyển sang luồng thay thế A1: gợi ý tổ hợp môn dựa trên thế mạnh học tập đã nhập trước đó",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-018",
+      "module": "04. Thông tin ngữ cảnh",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Nhập kỳ vọng của gia đình khác với sở thích cá nhân",
+      "precondition": "Học sinh đã có kết quả RIASEC thiên về nhóm Artistic",
+      "test_data": "Chọn 'Gia đình mong muốn em học ngành Kinh tế/Tài chính'",
+      "steps": [
+        "1. Học sinh nhập kỳ vọng gia đình khác với xu hướng cá nhân",
+        "2. Xác nhận"
+      ],
+      "expected_result": "Hệ thống ghi nhận mâu thuẫn, ở bước kết quả sẽ đưa ra tư vấn cân bằng giữa 2 yếu tố, không bỏ qua yếu tố nào",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-019",
+      "module": "04. Thông tin ngữ cảnh",
+      "test_type": "Chức năng",
+      "priority": "Thấp",
+      "scenario": "Nhập điều kiện tài chính/khu vực hạn chế",
+      "precondition": "Học sinh đang ở bước nhập ngữ cảnh",
+      "test_data": "Chọn 'Ngân sách thấp, chỉ học được trong khu vực tỉnh/thành hiện tại'",
+      "steps": [
+        "1. Học sinh chọn điều kiện tài chính, khu vực",
+        "2. Xác nhận"
+      ],
+      "expected_result": "Hệ thống lọc bớt các gợi ý trường ở xa/học phí cao, ưu tiên các lựa chọn khả thi hơn",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-020",
+      "module": "04. Thông tin ngữ cảnh",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh chọn mức độ 'chưa biết định hướng gì cả'",
+      "precondition": "Học sinh đang ở bước cuối phần nhập ngữ cảnh",
+      "test_data": "Chọn 'Em hoàn toàn chưa biết mình thích ngành gì'",
+      "steps": [
+        "1. Học sinh chọn mức độ chưa rõ ràng",
+        "2. Xác nhận"
+      ],
+      "expected_result": "Hệ thống điều chỉnh phần kết quả theo hướng giải thích sâu, gợi mở nhiều lựa chọn hơn thay vì chỉ đưa danh sách ngắn gọn",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-021",
+      "module": "05. Engine gợi ý ngành nghề",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Sinh kết quả gợi ý khi đầy đủ toàn bộ input",
+      "precondition": "Học sinh đã hoàn tất tất cả các bước nhập liệu",
+      "test_data": "Bộ input đầy đủ và hợp lệ ở tất cả các bước trên",
+      "steps": [
+        "1. Hệ thống tổng hợp toàn bộ dữ liệu",
+        "2. Chạy công thức tính điểm (RIASEC 30% + Xu hướng 25% + Học tập 20% + Tính cách 15%)",
+        "3. Xuất kết quả"
+      ],
+      "expected_result": "Hệ thống trả về đúng Top 3-5 ngành phù hợp nhất, có căn cứ rõ ràng, không bị trùng lặp ngành trong danh sách",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-022",
+      "module": "05. Engine gợi ý ngành nghề",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Cao",
+      "scenario": "Dữ liệu xu hướng ngành nghề chưa được cập nhật/lỗi thời",
+      "precondition": "Cơ sở dữ liệu xu hướng ngành nghề quá hạn cập nhật (VD: > 6 tháng)",
+      "test_data": "Timestamp cập nhật dữ liệu xu hướng: quá hạn",
+      "steps": [
+        "1. Học sinh hoàn tất nhập liệu và nhận kết quả",
+        "2. Hệ thống kiểm tra thời điểm cập nhật dữ liệu xu hướng"
+      ],
+      "expected_result": "Hệ thống vẫn trả kết quả nhưng hiển thị cảnh báo rõ ràng về việc dữ liệu xu hướng có thể chưa mới nhất, kèm mốc thời gian cập nhật gần nhất",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-023",
+      "module": "05. Engine gợi ý ngành nghề",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Kết quả RIASEC và kỳ vọng gia đình mâu thuẫn nhau",
+      "precondition": "Học sinh có mã RIASEC là 'AES' nhưng gia đình kỳ vọng ngành Kỹ thuật (nhóm R)",
+      "test_data": "Input mâu thuẫn giữa sở thích cá nhân và kỳ vọng gia đình",
+      "steps": [
+        "1. Hệ thống chạy engine với input mâu thuẫn"
+      ],
+      "expected_result": "Hệ thống đưa ra gợi ý cân bằng (VD: các ngành giao thoa giữa 2 nhóm nếu có), đồng thời giải thích rõ sự khác biệt thay vì chỉ chọn một phía",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-024",
+      "module": "05. Engine gợi ý ngành nghề",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Không có ngành nào khớp đủ điều kiện lọc (do ràng buộc tài chính/khu vực quá hẹp)",
+      "precondition": "Học sinh nhập điều kiện tài chính/khu vực rất hạn chế",
+      "test_data": "Ràng buộc khiến danh sách ngành phù hợp bị lọc còn 0 kết quả",
+      "steps": [
+        "1. Hệ thống chạy engine lọc theo toàn bộ điều kiện"
+      ],
+      "expected_result": "Hệ thống không trả về danh sách rỗng; tự động nới lỏng ràng buộc ít quan trọng nhất và thông báo rõ cho học sinh biết đã điều chỉnh tiêu chí nào",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-025",
+      "module": "05. Engine gợi ý ngành nghề",
+      "test_type": "Hiệu năng",
+      "priority": "Cao",
+      "scenario": "Thời gian phản hồi khi tính toán kết quả",
+      "precondition": "Học sinh vừa hoàn tất bước nhập liệu cuối cùng",
+      "test_data": "Bộ input đầy đủ tiêu chuẩn",
+      "steps": [
+        "1. Học sinh nhấn 'Xem kết quả'",
+        "2. Đo thời gian từ lúc nhấn đến khi hiển thị kết quả"
+      ],
+      "expected_result": "Thời gian phản hồi không vượt quá ngưỡng chấp nhận được đã định nghĩa trong NFR (ví dụ dưới 5-10 giây), có chỉ báo đang xử lý nếu lâu hơn",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-026",
+      "module": "05. Engine gợi ý ngành nghề",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "AI/LLM diễn giải kết quả bằng ngôn ngữ tự nhiên, đúng dữ liệu đã tính",
+      "precondition": "Đã có kết quả scoring từ engine rule-based",
+      "test_data": "Kết quả scoring: Top 1 là 'Công nghệ thông tin'",
+      "steps": [
+        "1. Hệ thống đưa kết quả scoring cho AI để sinh văn bản giải thích",
+        "2. Kiểm tra nội dung AI sinh ra"
+      ],
+      "expected_result": "Nội dung AI sinh ra phải khớp đúng với ngành đã được tính điểm cao nhất, không tự thêm ngành ngoài danh sách đã tính (chống hallucination)",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-027",
+      "module": "05. Engine gợi ý ngành nghề",
+      "test_type": "Bảo mật",
+      "priority": "Cao",
+      "scenario": "Kiểm tra AI không bịa thông tin trường/ngành không có thật",
+      "precondition": "Hệ thống đã sinh phần tư vấn mở rộng (follow-up Q&A)",
+      "test_data": "Câu hỏi: 'Trường nào đào tạo ngành Kỹ thuật Vũ trụ tại Việt Nam?' (ngành hiếm/không phổ biến)",
+      "steps": [
+        "1. Học sinh hỏi thêm về một ngành hiếm gặp",
+        "2. Quan sát câu trả lời của AI"
+      ],
+      "expected_result": "AI trả lời dựa trên dữ liệu đã xác thực hoặc thông báo không có đủ thông tin, không tự bịa ra tên trường/ngành không tồn tại",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-028",
+      "module": "06. Hiển thị kết quả",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Hiển thị đầy đủ nội dung kết quả gợi ý",
+      "precondition": "Engine đã trả về kết quả tính toán",
+      "test_data": "Kết quả: Top 3 ngành, khối thi, trường tham khảo, lộ trình ôn thi",
+      "steps": [
+        "1. Hệ thống render giao diện kết quả cho học sinh"
+      ],
+      "expected_result": "Giao diện hiển thị đầy đủ: tên ngành, lý do phù hợp, khối thi/tổ hợp môn tương ứng, gợi ý trường, lộ trình ôn thi ĐGNL",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-029",
+      "module": "06. Hiển thị kết quả",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh hỏi thêm 'vì sao ngành này phù hợp với em'",
+      "precondition": "Học sinh đã nhận kết quả gợi ý",
+      "test_data": "Câu hỏi follow-up của học sinh",
+      "steps": [
+        "1. Học sinh đặt câu hỏi giải thích thêm",
+        "2. Chatbot trả lời"
+      ],
+      "expected_result": "Chatbot đưa ra lý do cụ thể dựa trên dữ liệu đã thu thập trước đó (VD: mã RIASEC, thế mạnh môn học), không trả lời chung chung",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-030",
+      "module": "06. Hiển thị kết quả",
+      "test_type": "Usability",
+      "priority": "Trung bình",
+      "scenario": "Kết quả hiển thị dễ hiểu với học sinh lớp 12 (không dùng thuật ngữ khó)",
+      "precondition": "Đã có kết quả gợi ý",
+      "test_data": "Nội dung kết quả sinh ra bởi AI",
+      "steps": [
+        "1. Kiểm tra ngôn ngữ, thuật ngữ trong phần kết quả"
+      ],
+      "expected_result": "Ngôn ngữ gần gũi, không dùng thuật ngữ chuyên ngành khó hiểu (VD: không dùng nguyên văn 'Holland Code Enterprising' mà diễn giải dễ hiểu)",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-031",
+      "module": "06. Hiển thị kết quả",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Học sinh không đồng ý với kết quả gợi ý",
+      "precondition": "Học sinh đã nhận kết quả nhưng cảm thấy chưa đúng",
+      "test_data": "Học sinh chọn 'Kết quả này chưa đúng với em'",
+      "steps": [
+        "1. Học sinh phản hồi không hài lòng",
+        "2. Chọn lý do (VD: chưa đúng sở thích/chưa đúng năng lực)"
+      ],
+      "expected_result": "Hệ thống ghi nhận phản hồi, gợi ý học sinh làm lại một phần trắc nghiệm liên quan hoặc điều chỉnh lại input, không bắt làm lại từ đầu",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-032",
+      "module": "07. Lưu & chia sẻ kết quả",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh lưu kết quả lại tài khoản",
+      "precondition": "Học sinh đã nhận kết quả và đã đăng nhập/có định danh",
+      "test_data": "Chọn chức năng 'Lưu kết quả'",
+      "steps": [
+        "1. Học sinh nhấn lưu kết quả",
+        "2. Xác nhận"
+      ],
+      "expected_result": "Kết quả được lưu đúng vào hồ sơ học sinh, có thể truy xuất lại ở lần đăng nhập sau",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-033",
+      "module": "07. Lưu & chia sẻ kết quả",
+      "test_type": "Chức năng",
+      "priority": "Thấp",
+      "scenario": "Học sinh chia sẻ kết quả cho phụ huynh/giáo viên",
+      "precondition": "Học sinh đã có kết quả",
+      "test_data": "Chọn chức năng 'Chia sẻ' qua link hoặc file",
+      "steps": [
+        "1. Học sinh chọn chia sẻ",
+        "2. Chọn kênh chia sẻ (link/PDF)"
+      ],
+      "expected_result": "Hệ thống tạo được link/file chia sẻ chính xác nội dung kết quả, không làm lộ các dữ liệu nhạy cảm khác ngoài kết quả gợi ý",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-034",
+      "module": "07. Lưu & chia sẻ kết quả",
+      "test_type": "Bảo mật",
+      "priority": "Cao",
+      "scenario": "Kiểm tra quyền riêng tư khi chia sẻ kết quả",
+      "precondition": "Học sinh tạo link chia sẻ kết quả",
+      "test_data": "Link chia sẻ công khai",
+      "steps": [
+        "1. Người khác không phải học sinh mở link chia sẻ"
+      ],
+      "expected_result": "Link chỉ hiển thị đúng phần kết quả được phép chia sẻ, không lộ thông tin cá nhân nhạy cảm khác (VD: điểm số chi tiết, kỳ vọng gia đình) nếu học sinh không chọn hiển thị",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-035",
+      "module": "08. Luồng hội thoại chatbot",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Chatbot ghi nhớ ngữ cảnh xuyên suốt hội thoại",
+      "precondition": "Học sinh đang ở giữa luồng nhập liệu nhiều bước",
+      "test_data": "Học sinh trả lời rải rác qua nhiều bước",
+      "steps": [
+        "1. Học sinh cung cấp thông tin ở bước 2",
+        "2. Ở bước 5, chatbot cần dùng lại thông tin đó"
+      ],
+      "expected_result": "Chatbot không hỏi lại thông tin đã cung cấp trước đó, sử dụng đúng ngữ cảnh đã lưu",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-036",
+      "module": "08. Luồng hội thoại chatbot",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh trả lời bằng câu tự do thay vì chọn trắc nghiệm",
+      "precondition": "Học sinh đang ở bước có thể trả lời tự do",
+      "test_data": "Câu trả lời: 'Em thích vẽ nhưng ba mẹ muốn em học kinh tế'",
+      "steps": [
+        "1. Học sinh nhập câu trả lời tự do",
+        "2. Chatbot xử lý NLU"
+      ],
+      "expected_result": "Chatbot trích xuất đúng 2 ý: sở thích cá nhân (nghệ thuật) và kỳ vọng gia đình (kinh tế), đưa cả 2 vào dữ liệu ngữ cảnh",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-037",
+      "module": "08. Luồng hội thoại chatbot",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Học sinh nhập nội dung không liên quan/spam trong lúc trả lời",
+      "precondition": "Học sinh đang trong luồng hội thoại",
+      "test_data": "Nội dung: ký tự ngẫu nhiên hoặc câu hỏi ngoài chủ đề",
+      "steps": [
+        "1. Học sinh nhập nội dung không liên quan",
+        "2. Quan sát phản hồi chatbot"
+      ],
+      "expected_result": "Chatbot lịch sự nhắc lại câu hỏi hiện tại, không bị lỗi luồng hoặc trả lời sai ngữ cảnh",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-038",
+      "module": "08. Luồng hội thoại chatbot",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh quay lại chỉnh sửa câu trả lời ở bước trước",
+      "precondition": "Học sinh đang ở bước sau trong luồng nhiều bước",
+      "test_data": "Yêu cầu 'quay lại chỉnh sửa câu trả lời trước'",
+      "steps": [
+        "1. Học sinh chọn quay lại bước trước",
+        "2. Chỉnh sửa câu trả lời",
+        "3. Tiếp tục"
+      ],
+      "expected_result": "Hệ thống cập nhật đúng dữ liệu đã chỉnh sửa, không tạo bản ghi trùng lặp, các bước sau tính toán lại theo dữ liệu mới",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-039",
+      "module": "08. Luồng hội thoại chatbot",
+      "test_type": "Usability",
+      "priority": "Trung bình",
+      "scenario": "Giọng điệu chatbot phù hợp lứa tuổi học sinh lớp 12",
+      "precondition": "Xuyên suốt hội thoại",
+      "test_data": "Toàn bộ nội dung phản hồi của chatbot",
+      "steps": [
+        "1. Rà soát ngôn ngữ, giọng điệu của chatbot trong toàn bộ luồng"
+      ],
+      "expected_result": "Giọng điệu thân thiện, gần gũi, không quá học thuật hoặc quá trẻ con, phù hợp tâm lý học sinh 17-18 tuổi",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-040",
+      "module": "09. Phi chức năng",
+      "test_type": "Hiệu năng",
+      "priority": "Cao",
+      "scenario": "Chịu tải nhiều học sinh sử dụng đồng thời",
+      "precondition": "Hệ thống đang hoạt động bình thường",
+      "test_data": "Giả lập 500-1000 học sinh truy cập đồng thời (theo kịch bản mùa thi)",
+      "steps": [
+        "1. Chạy kịch bản kiểm thử tải (load test)"
+      ],
+      "expected_result": "Hệ thống vẫn phản hồi trong ngưỡng thời gian chấp nhận được, không bị crash hoặc timeout hàng loạt",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-041",
+      "module": "09. Phi chức năng",
+      "test_type": "Bảo mật",
+      "priority": "Cao",
+      "scenario": "Bảo vệ dữ liệu cá nhân học sinh (ngày sinh, điểm số, thông tin gia đình)",
+      "precondition": "Học sinh đã nhập đầy đủ thông tin cá nhân",
+      "test_data": "Dữ liệu cá nhân đã lưu trong hệ thống",
+      "steps": [
+        "1. Kiểm tra cơ chế lưu trữ, mã hóa dữ liệu",
+        "2. Thử truy cập trái phép vào dữ liệu"
+      ],
+      "expected_result": "Dữ liệu được mã hóa/bảo vệ đúng chuẩn, không thể truy cập trái phép từ bên ngoài",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-042",
+      "module": "09. Phi chức năng",
+      "test_type": "Khả năng tiếp cận",
+      "priority": "Trung bình",
+      "scenario": "Chatbot hoạt động ổn định trên nhiều thiết bị (điện thoại, máy tính)",
+      "precondition": "Học sinh truy cập từ các thiết bị khác nhau",
+      "test_data": "Truy cập từ điện thoại Android, iOS, trình duyệt desktop",
+      "steps": [
+        "1. Thực hiện toàn bộ luồng chính trên từng loại thiết bị"
+      ],
+      "expected_result": "Giao diện và luồng hội thoại hoạt động nhất quán, không lỗi hiển thị hay mất chức năng trên bất kỳ thiết bị nào",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-043",
+      "module": "09. Phi chức năng",
+      "test_type": "Độ tin cậy (AI)",
+      "priority": "Cao",
+      "scenario": "Kiểm tra AI không tự ý thay đổi trọng số/công thức scoring đã định nghĩa",
+      "precondition": "Hệ thống đã cấu hình công thức scoring cố định (RIASEC 30%, Xu hướng 25%, Học tập 20%, Tính cách 15%)",
+      "test_data": "Nhiều bộ input mẫu khác nhau",
+      "steps": [
+        "1. Chạy nhiều bộ input mẫu qua engine nhiều lần",
+        "2. Kiểm tra công thức áp dụng có nhất quán không"
+      ],
+      "expected_result": "Trọng số áp dụng luôn nhất quán theo đúng công thức đã định nghĩa, không bị AI tự do điều chỉnh giữa các lần chạy khác nhau với cùng input",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-044",
+      "module": "09. Phi chức năng",
+      "test_type": "Khả năng phục hồi",
+      "priority": "Trung bình",
+      "scenario": "Mất kết nối mạng giữa chừng khi đang xử lý kết quả",
+      "precondition": "Học sinh vừa nhấn 'Xem kết quả', hệ thống đang xử lý",
+      "test_data": "Ngắt kết nối mạng đột ngột trong lúc xử lý",
+      "steps": [
+        "1. Ngắt mạng khi hệ thống đang tính toán",
+        "2. Kết nối lại sau vài giây/phút"
+      ],
+      "expected_result": "Hệ thống không tính toán trùng lặp hoặc mất dữ liệu đã nhập, hiển thị lại đúng trạng thái hoặc kết quả khi kết nối được khôi phục",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-045",
+      "module": "10. Xử lý câu trả lời - Câu đơn giản",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh trả lời câu hỏi dạng lựa chọn đơn giản (Có/Không, chọn 1 đáp án)",
+      "precondition": "Chatbot đang đặt câu hỏi trắc nghiệm dạng đơn lựa chọn",
+      "test_data": "Câu hỏi: 'Em có thích sửa chữa đồ vật, máy móc không?' Trả lời: 'Có'",
+      "steps": [
+        "1. Chatbot đặt câu hỏi đơn giản",
+        "2. Học sinh chọn/nhập 1 đáp án duy nhất"
+      ],
+      "expected_result": "Hệ thống ghi nhận đúng 1 giá trị vào đúng nhóm RIASEC tương ứng, chuyển sang câu hỏi tiếp theo ngay",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-046",
+      "module": "10. Xử lý câu trả lời - Câu đơn giản",
+      "test_type": "Chức năng",
+      "priority": "Thấp",
+      "scenario": "Học sinh trả lời cụt lủn/1 từ",
+      "precondition": "Chatbot đặt câu hỏi mở dạng ngắn",
+      "test_data": "Câu trả lời: 'Ừ' / 'Không' / 'Tùy'",
+      "steps": [
+        "1. Học sinh trả lời bằng 1 từ mơ hồ"
+      ],
+      "expected_result": "Chatbot hiểu đúng ý nếu rõ nghĩa (Ừ/Không), còn với từ mơ hồ ('Tùy') thì hỏi lại để làm rõ thay vì tự suy diễn",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-047",
+      "module": "10. Xử lý câu trả lời - Câu multi-step",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Học sinh trả lời 1 câu nhưng chứa nhiều thông tin thuộc nhiều nhóm khác nhau",
+      "precondition": "Chatbot đang ở bước hỏi mở về sở thích",
+      "test_data": "Câu trả lời: 'Em thích vẽ, cũng thích tính toán logic, với lại thích chỉ huy nhóm làm việc'",
+      "steps": [
+        "1. Học sinh trả lời 1 câu chứa 3 ý (Artistic, Investigative, Enterprising)",
+        "2. Chatbot xử lý NLU"
+      ],
+      "expected_result": "Hệ thống tách đúng và cộng điểm cho cả 3 nhóm RIASEC tương ứng trong cùng 1 lượt xử lý, không chỉ nhận diện ý đầu tiên rồi bỏ qua phần còn lại",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-048",
+      "module": "10. Xử lý câu trả lời - Câu multi-step",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Học sinh trả lời gộp nhiều bước cùng lúc (trả lời trước khi được hỏi)",
+      "precondition": "Chatbot mới hỏi về sở thích, chưa hỏi tới tổ hợp môn hay tài chính",
+      "test_data": "Câu trả lời: 'Em thích Toán Lý Hóa, học khối A00, nhà em ở tỉnh nên chắc không đi học xa được'",
+      "steps": [
+        "1. Học sinh cung cấp thông tin của 3 bước khác nhau (thế mạnh môn học, tổ hợp môn, ràng buộc khu vực) trong 1 lượt trả lời"
+      ],
+      "expected_result": "Hệ thống nhận diện và điền sẵn dữ liệu cho cả 3 module tương ứng, bỏ qua các câu hỏi đã được trả lời trước, chỉ hỏi tiếp phần còn thiếu",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-049",
+      "module": "10. Xử lý câu trả lời - Câu multi-step",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Học sinh trả lời nhiều ý nhưng có ý không thuộc phạm vi bất kỳ nhóm nào",
+      "precondition": "Chatbot đang hỏi mở về sở thích/năng lực",
+      "test_data": "Câu trả lời: 'Em thích chơi game, thích đi du lịch, với lại thích ngủ nướng'",
+      "steps": [
+        "1. Học sinh trả lời các ý không map rõ vào RIASEC/tiêu chí nào"
+      ],
+      "expected_result": "Hệ thống không cố gán ép vào một nhóm sai, có thể hỏi lại làm rõ hoặc bỏ qua phần không liên quan, không làm sai lệch điểm số",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-050",
+      "module": "10. Xử lý câu trả lời - Câu bẫy/mâu thuẫn",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Cao",
+      "scenario": "Học sinh trả lời mâu thuẫn với chính câu trả lời trước đó trong cùng bài test",
+      "precondition": "Học sinh đã trả lời 'Rất thích làm việc nhóm, thuyết trình trước đám đông' ở câu trước (nhóm E cao)",
+      "test_data": "Câu sau: 'Em rất ngại giao tiếp, chỉ thích làm việc một mình, không thích đứng trước đám đông'",
+      "steps": [
+        "1. Học sinh trả lời mâu thuẫn với câu trước đó trong cùng nhóm Enterprising/Social",
+        "2. Hệ thống tổng hợp điểm"
+      ],
+      "expected_result": "Hệ thống không bị lỗi tính điểm, vẫn tổng hợp điểm trung bình đúng thuật toán; nếu độ lệch quá lớn có thể gắn cờ 'câu trả lời chưa nhất quán' để cân nhắc khi diễn giải kết quả",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-051",
+      "module": "10. Xử lý câu trả lời - Câu bẫy/mâu thuẫn",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Cao",
+      "scenario": "Câu hỏi có yếu tố dẫn dắt (leading) khiến học sinh dễ trả lời theo mong muốn xã hội",
+      "precondition": "Bộ câu hỏi RIASEC đang được học sinh trả lời",
+      "test_data": "Câu hỏi ví dụ cần rà soát: 'Em có phải người giỏi giao tiếp và luôn được mọi người yêu thích không?'",
+      "steps": [
+        "1. Rà soát nội dung từng câu hỏi trong bộ RIASEC/tính cách",
+        "2. Kiểm tra câu hỏi có mang tính dẫn dắt/đánh giá đạo đức không"
+      ],
+      "expected_result": "Bộ câu hỏi không chứa câu dẫn dắt hoặc có hàm ý đúng/sai về mặt xã hội, đảm bảo học sinh trả lời trung thực theo cảm nhận thật, không bị áp lực chọn đáp án 'đẹp'",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-052",
+      "module": "10. Xử lý câu trả lời - Câu bẫy/mâu thuẫn",
+      "test_type": "Chức năng",
+      "priority": "Cao",
+      "scenario": "Học sinh cố tình trả lời đối lập ở 2 câu hỏi kiểm tra chéo (câu hỏi lặp ý để kiểm tra độ tin cậy)",
+      "precondition": "Bộ câu hỏi có thiết kế 1-2 cặp câu hỏi lặp ý để kiểm tra độ nhất quán (reliability check)",
+      "test_data": "Cặp câu: 'Em thích làm việc với số liệu, sổ sách' (đầu bài) và 'Em ghét các công việc đòi hỏi sự tỉ mỉ, ngăn nắp' (cuối bài, cùng đo nhóm Conventional nhưng đảo chiều)",
+      "steps": [
+        "1. Học sinh trả lời mâu thuẫn ở cặp câu kiểm tra chéo",
+        "2. Hệ thống tính chỉ số nhất quán nội bộ"
+      ],
+      "expected_result": "Hệ thống phát hiện được sự thiếu nhất quán, có thể hiển thị gợi ý nhẹ nhàng đề nghị học sinh xem lại một số câu trả lời trước khi chốt kết quả cuối",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-053",
+      "module": "10. Xử lý câu trả lời - Câu bẫy/mâu thuẫn",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh trả lời mang tính mỉa mai/đùa giỡn nhưng chatbot hiểu theo nghĩa đen",
+      "precondition": "Chatbot đang hỏi câu mở về sở thích nghề nghiệp",
+      "test_data": "Câu trả lời: 'Ngành nào lương cao nhàn hạ khỏi làm gì thì em thích'",
+      "steps": [
+        "1. Học sinh trả lời đùa/mỉa mai, không nghiêm túc"
+      ],
+      "expected_result": "Chatbot nhận diện được đây là câu trả lời không cung cấp thông tin thực chất, phản hồi khéo léo mời học sinh trả lời nghiêm túc hơn thay vì tính điểm sai lệch từ câu đùa",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-054",
+      "module": "10. Xử lý câu trả lời - Câu bẫy/mâu thuẫn",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Câu hỏi có 2 vế đối lập trong cùng 1 câu (compound question) gây khó trả lời chính xác",
+      "precondition": "Bộ câu hỏi tính cách/RIASEC có câu dạng ghép 2 ý",
+      "test_data": "Câu hỏi ví dụ cần rà soát: 'Em thích làm việc độc lập nhưng cũng thích được mọi người công nhận, đúng không?'",
+      "steps": [
+        "1. Rà soát các câu hỏi có cấu trúc ghép 2 mệnh đề trở lên"
+      ],
+      "expected_result": "Bộ câu hỏi tránh cấu trúc ghép nhiều ý trong 1 câu; mỗi câu hỏi chỉ đo 1 khía cạnh duy nhất để tránh học sinh trả lời mơ hồ hoặc chọn bừa",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-055",
+      "module": "10. Xử lý câu trả lời - Câu bẫy/mâu thuẫn",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh trả lời nước đôi/lấp lửng không rõ ý định",
+      "precondition": "Chatbot đang hỏi về mức độ rõ ràng định hướng ngành nghề",
+      "test_data": "Câu trả lời: 'Cũng không biết nữa, sao cũng được, tùy'",
+      "steps": [
+        "1. Học sinh trả lời không rõ quan điểm"
+      ],
+      "expected_result": "Chatbot xếp học sinh vào nhóm 'chưa rõ định hướng', không ép học sinh phải chọn 1 phương án cụ thể, điều chỉnh phần kết quả theo hướng gợi mở nhiều hơn",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-056",
+      "module": "10. Xử lý câu trả lời - Ngôn ngữ/chính tả",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Trung bình",
+      "scenario": "Học sinh trả lời bằng ngôn ngữ teen/viết tắt/sai chính tả",
+      "precondition": "Chatbot đang ở bước hỏi mở",
+      "test_data": "Câu trả lời: 'e thík lm nghệ thuật hơn, ko thík số liệu j hết'",
+      "steps": [
+        "1. Học sinh trả lời bằng ngôn ngữ không chuẩn (viết tắt, sai chính tả)"
+      ],
+      "expected_result": "Hệ thống vẫn hiểu đúng ý chính (thích nghệ thuật, không thích số liệu) và gán điểm đúng nhóm, không bị lỗi do sai chính tả/viết tắt phổ biến",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-057",
+      "module": "10. Xử lý câu trả lời - Ngôn ngữ/chính tả",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Thấp",
+      "scenario": "Học sinh trả lời bằng tiếng Anh xen tiếng Việt",
+      "precondition": "Chatbot đang hỏi mở",
+      "test_data": "Câu trả lời: 'Em thích design với art hơn là mấy môn logic'",
+      "steps": [
+        "1. Học sinh trả lời xen ngôn ngữ"
+      ],
+      "expected_result": "Hệ thống vẫn nhận diện đúng ý (Artistic cao, Investigative thấp), không bị lỗi xử lý do câu có từ tiếng Anh xen kẽ",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-058",
+      "module": "10. Xử lý câu trả lời - Câu hỏi ngược",
+      "test_type": "Chức năng",
+      "priority": "Trung bình",
+      "scenario": "Học sinh hỏi ngược lại chatbot thay vì trả lời câu hỏi hiện tại",
+      "precondition": "Chatbot vừa đặt 1 câu hỏi trắc nghiệm",
+      "test_data": "Câu hỏi ngược: 'RIASEC là gì vậy, sao lại hỏi mấy câu này?'",
+      "steps": [
+        "1. Học sinh đặt câu hỏi ngược thay vì trả lời",
+        "2. Chatbot xử lý"
+      ],
+      "expected_result": "Chatbot trả lời ngắn gọn giải thích mục đích câu hỏi, sau đó quay lại đúng câu hỏi ban đầu, không làm mất luồng hoặc bỏ sót câu hỏi đó",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    },
+    {
+      "test_case_id": "TC-059",
+      "module": "10. Xử lý câu trả lời - Câu hỏi ngược",
+      "test_type": "Biên/Ngoại lệ",
+      "priority": "Cao",
+      "scenario": "Học sinh cố tình hỏi chatbot để 'thao túng' ra kết quả mong muốn trước",
+      "precondition": "Học sinh chưa hoàn tất bài test",
+      "test_data": "Câu hỏi: 'Em trả lời sao thì ra kết quả là ngành Công nghệ thông tin vậy chatbot?'",
+      "steps": [
+        "1. Học sinh hỏi cách để đạt kết quả mong muốn từ trước"
+      ],
+      "expected_result": "Chatbot từ chối tiết lộ công thức/đáp án dẫn tới kết quả định trước, khuyến khích học sinh trả lời trung thực theo cảm nhận thật của bản thân",
+      "actual_result": "",
+      "status": "Chưa thực hiện"
+    }
+  ]
+}
