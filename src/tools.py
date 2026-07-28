@@ -110,24 +110,103 @@ def university_search(major: str, region: str = "Toàn quốc", max_tuition: int
         return f"Không tìm thấy trường nào phù hợp với tiêu chí: Ngành '{major}', Khu vực '{region}', Học phí dưới {int(max_tuition/1000000)} triệu/năm."
 
 
-def personality_assessment(answers: str) -> str:
+def get_personality_questions(section: str = "riasec", limit: int = 5) -> str:
     """
-    Đánh giá tính cách (RIASEC/MBTI/Big Five) từ câu trả lời của người dùng.
+    Lấy danh sách các câu hỏi trắc nghiệm tính cách.
     Args:
-        answers (str): Các câu trả lời của người dùng về sở thích, thói quen.
+        section (str): Phần cần lấy ('riasec', 'mbti' hoặc 'all').
+        limit (int): Số lượng câu hỏi muốn lấy.
     Returns:
-        str: Kết quả đánh giá nhóm tính cách.
+        str: Danh sách câu hỏi (kèm ID).
     """
-    ans_lower = answers.lower()
-    if "kỹ thuật" in ans_lower or "máy móc" in ans_lower or "sửa chữa" in ans_lower:
-        return "Kết quả RIASEC: Nhóm R (Realistic - Thực tế). Phù hợp: Kỹ sư, CNTT, Cơ khí."
-    elif "nghệ thuật" in ans_lower or "sáng tạo" in ans_lower or "vẽ" in ans_lower:
-        return "Kết quả RIASEC: Nhóm A (Artistic - Nghệ thuật). Phù hợp: Thiết kế, Truyền thông, Marketing."
-    elif "giao tiếp" in ans_lower or "giúp đỡ" in ans_lower or "con người" in ans_lower:
-        return "Kết quả RIASEC: Nhóm S (Social - Xã hội). Phù hợp: Giáo viên, Tâm lý học, Nhân sự."
-    else:
-        return "Kết quả RIASEC: Đang phân tích. Vui lòng cung cấp thêm thông tin về sở thích lúc rảnh rỗi của bạn."
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(os.path.dirname(current_dir), "config", "question.json")
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception as e:
+        return f"Lỗi đọc dữ liệu câu hỏi: {e}"
+        
+    questions = data.get("questions", [])
+    if section != "all":
+        questions = [q for q in questions if q.get("section") == section]
+        
+    questions = questions[:limit]
+    
+    result = []
+    for q in questions:
+        result.append(f"[{q['id']}] {q['text']}")
+        
+    return "Danh sách câu hỏi:\n" + "\n".join(result)
 
+
+def calculate_personality_score(answers_json: str) -> str:
+    """
+    Tính điểm trắc nghiệm tính cách dựa trên câu trả lời.
+    Args:
+        answers_json (str): Chuỗi JSON { "ID_câu_hỏi": điểm_1_đến_5 }. VD: '{"R01": 5, "I01": 3}'
+    Returns:
+        str: Kết quả phân tích tính cách RIASEC / MBTI.
+    """
+    try:
+        answers = json.loads(answers_json)
+    except Exception:
+        return "Lỗi: Đầu vào answers_json phải là một chuỗi JSON hợp lệ (VD: {\"R01\": 5, \"I01\": 3})."
+        
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(os.path.dirname(current_dir), "config", "question.json")
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception as e:
+        return f"Lỗi đọc cấu hình điểm: {e}"
+        
+    riasec_scores = {"R": 0, "I": 0, "A": 0, "S": 0, "E": 0, "C": 0}
+    mbti_scores = {"E": 0, "I": 0, "S": 0, "N": 0, "T": 0, "F": 0, "J": 0, "P": 0}
+    
+    questions = data.get("questions", [])
+    q_map = {q["id"]: q for q in questions}
+    
+    for q_id, score in answers.items():
+        if q_id not in q_map:
+            continue
+        q = q_map[q_id]
+        if q["section"] == "riasec":
+            trait = q.get("trait")
+            if trait in riasec_scores:
+                riasec_scores[trait] += int(score)
+        elif q["section"] == "mbti":
+            pole = q.get("pole")
+            if pole in mbti_scores:
+                mbti_scores[pole] += int(score)
+                
+    result_text = []
+    
+    if sum(riasec_scores.values()) > 0:
+        sorted_riasec = sorted(riasec_scores.items(), key=lambda item: item[1], reverse=True)
+        top_3 = sorted_riasec[:3]
+        holland_code = "".join([t[0] for t in top_3])
+        result_text.append(f"Mã Holland (RIASEC) của bạn là: {holland_code}")
+        
+        dimensions = data.get("dimensions", {}).get("riasec", {})
+        for trait, score in top_3:
+            name_vi = dimensions.get(trait, {}).get("name_vi", trait)
+            result_text.append(f"- {name_vi}: {score} điểm")
+            
+    if sum(mbti_scores.values()) > 0:
+        mbti_result = ""
+        mbti_result += "E" if mbti_scores["E"] >= mbti_scores["I"] else "I"
+        mbti_result += "S" if mbti_scores["S"] >= mbti_scores["N"] else "N"
+        mbti_result += "T" if mbti_scores["T"] >= mbti_scores["F"] else "F"
+        mbti_result += "J" if mbti_scores["J"] >= mbti_scores["P"] else "P"
+        result_text.append(f"\nNhóm tính cách MBTI của bạn là: {mbti_result}")
+        
+    if not result_text:
+        return "Không có dữ liệu điểm để phân tích. Hãy kiểm tra lại ID câu hỏi."
+        
+    return "\n".join(result_text)
 
 def academic_strength_analyzer(grades_and_skills: str) -> str:
     """
@@ -263,7 +342,8 @@ AVAILABLE_TOOLS = {
     "major_matching": major_matching,
     "career_database_search": career_database_search,
     "university_search": university_search,
-    "personality_assessment": personality_assessment,
+    "get_personality_questions": get_personality_questions,
+    "calculate_personality_score": calculate_personality_score,
     "academic_strength_analyzer": academic_strength_analyzer,
     "career_trend_search": career_trend_search,
     "financial_filter": financial_filter,
