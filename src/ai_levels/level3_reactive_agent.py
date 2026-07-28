@@ -19,12 +19,13 @@ from providers import OpenAIProvider, get_llm_provider
 def parse_action(response: str):
     """
     Parse phản hồi của LLM để tìm Action cần thực hiện.
-    Format mong đợi: Action: tool_name(param1, param2, ...)
+    Format mong đợi: Action: tool_name(param1, param2, ...) hoặc Action tool_name(param1, param2, ...)
     
     Returns:
         tuple: (tool_name, params) hoặc (None, None) nếu không tìm thấy
     """
-    action_match = re.search(r'Action:\s*(\w+)\s*[\(\[]([^\)\]]*)[\)\]]', response, re.IGNORECASE)
+    action_match = re.search(r'Action:?\s*(\w+)\s*[\(\[]([^\)\]]*)[\)\]]', response, re.IGNORECASE)
+
     
     if action_match:
         tool_name = action_match.group(1).strip()
