@@ -38,31 +38,33 @@ def parse_action(response: str):
             else:
                 import csv
                 import io
+                items = []
                 try:
                     reader = csv.reader(io.StringIO(params_str), skipinitialspace=True)
                     for row in reader:
-                        for item in row:
-                            item = item.strip().strip("'").strip('"')
-                            try:
-                                item = int(item)
-                            except ValueError:
-                                try:
-                                    item = float(item)
-                                except ValueError:
-                                    pass
-                            params.append(item)
+                        items.extend(row)
                 except Exception:
-                    for p in params_str.split(','):
-                        p = p.strip().strip('"').strip("'")
+                    items = params_str.split(',')
+
+                for item in items:
+                    item = item.strip().strip("'").strip('"')
+                    # Nếu LLM truyền dạng key=value (ví dụ section="riasec" hoặc limit=5)
+                    if "=" in item and not (item.startswith("{") and item.endswith("}")):
+                        item = item.split("=", 1)[1].strip().strip("'").strip('"')
+                    
+                    try:
+                        item = int(item)
+                    except ValueError:
                         try:
-                            p = int(p)
+                            item = float(item)
                         except ValueError:
                             pass
-                        params.append(p)
+                    params.append(item)
         
         return tool_name, params
     
     return None, None
+
 
 
 def execute_tool(tool_name: str, params: list):

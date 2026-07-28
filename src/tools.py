@@ -80,6 +80,18 @@ def university_search(major: str, region: str = "Toàn quốc", max_tuition: int
     Returns:
         str: Danh sách các trường đại học thỏa mãn tiêu chí.
     """
+    if isinstance(major, str) and "=" in major:
+        major = major.split("=")[-1].strip().strip("'").strip('"')
+    if isinstance(region, str) and "=" in region:
+        region = region.split("=")[-1].strip().strip("'").strip('"')
+    if isinstance(max_tuition, str):
+        if "=" in max_tuition:
+            max_tuition = max_tuition.split("=")[-1]
+        try:
+            max_tuition = int(max_tuition.strip().strip("'").strip('"'))
+        except ValueError:
+            max_tuition = 100000000
+
     # Read from config
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(os.path.dirname(current_dir), "config", "universities.json")
@@ -119,6 +131,23 @@ def get_personality_questions(section: str = "riasec", limit: int = 5) -> str:
     Returns:
         str: Danh sách câu hỏi (kèm ID).
     """
+    if isinstance(section, str) and "=" in section:
+        section = section.split("=")[-1].strip().strip("'").strip('"')
+    section = str(section).strip().strip("'").strip('"')
+
+    if isinstance(limit, str):
+        if "=" in limit:
+            limit = limit.split("=")[-1]
+        try:
+            limit = int(limit.strip().strip("'").strip('"'))
+        except ValueError:
+            limit = 5
+    elif not isinstance(limit, int):
+        try:
+            limit = int(limit)
+        except Exception:
+            limit = 5
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(os.path.dirname(current_dir), "config", "question.json")
     
@@ -139,6 +168,7 @@ def get_personality_questions(section: str = "riasec", limit: int = 5) -> str:
         result.append(f"[{q['id']}] {q['text']}")
         
     return "Danh sách câu hỏi:\n" + "\n".join(result)
+
 
 
 def calculate_personality_score(answers_json: str) -> str:
