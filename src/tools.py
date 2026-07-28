@@ -171,7 +171,7 @@ def get_personality_questions(section: str = "riasec", limit: int = 5) -> str:
 
 
 
-def calculate_personality_score(answers_json: str) -> str:
+def calculate_personality_score(answers_json: str, *args) -> str:
     """
     Tính điểm trắc nghiệm tính cách dựa trên câu trả lời.
     Args:
@@ -179,10 +179,25 @@ def calculate_personality_score(answers_json: str) -> str:
     Returns:
         str: Kết quả phân tích tính cách RIASEC / MBTI.
     """
+    if args:
+        answers_json = str(answers_json) + ", " + ", ".join(map(str, args))
+
     try:
         answers = json.loads(answers_json)
     except Exception:
-        return "Lỗi: Đầu vào answers_json phải là một chuỗi JSON hợp lệ (VD: {\"R01\": 5, \"I01\": 3})."
+        import re
+        pairs = re.findall(r'[\"\'\s]*([A-Za-z0-9_]+)[\"\'\s]*:\s*[\"\'\s]*([A-Za-z0-9_.]+)', str(answers_json))
+        if pairs:
+            dict_obj = {}
+            for k, v in pairs:
+                try:
+                    dict_obj[k] = int(v)
+                except ValueError:
+                    dict_obj[k] = v
+            answers = dict_obj
+        else:
+            return "Lỗi: Đầu vào answers_json phải là một chuỗi JSON hợp lệ (VD: {\"R01\": 5, \"I01\": 3})."
+
         
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(os.path.dirname(current_dir), "config", "question.json")

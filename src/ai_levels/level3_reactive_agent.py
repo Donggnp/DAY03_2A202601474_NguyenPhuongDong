@@ -32,7 +32,19 @@ def parse_action(response: str):
         
         params = []
         if params_str:
-            # Nếu param là một chuỗi JSON (ví dụ trong calculate_personality_score)
+            # Xử lý đặc biệt cho tool tính điểm trắc nghiệm hoặc tham số JSON
+            if tool_name == "calculate_personality_score" or (":" in params_str and ("{" in params_str or "}" in params_str)):
+                pairs = re.findall(r'[\"\'\s]*([A-Za-z0-9_]+)[\"\'\s]*:\s*[\"\'\s]*([A-Za-z0-9_.]+)', params_str)
+                if pairs:
+                    dict_obj = {}
+                    for k, v in pairs:
+                        try:
+                            dict_obj[k] = int(v)
+                        except ValueError:
+                            dict_obj[k] = v
+                    return tool_name, [json.dumps(dict_obj)]
+
+            # Nếu param là một chuỗi JSON chuẩn
             if params_str.startswith("{") and params_str.endswith("}"):
                 params = [params_str]
             else:
@@ -64,6 +76,7 @@ def parse_action(response: str):
         return tool_name, params
     
     return None, None
+
 
 
 
