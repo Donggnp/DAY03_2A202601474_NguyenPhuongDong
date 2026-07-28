@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "id": "career_assessment_v1",
+    "title": "Bộ trắc nghiệm hướng nghiệp 40 câu (RIASEC + MBTI rút gọn)",
+    "version": "1.0",
+    "language": "vi",
+    "total_questions": 40,
+    "estimated_time_minutes": 10,
+    "inputs": [
+      {
+        "no": 1,
+        "name": "RIASEC (Holland Code)",
+        "role": "Chính",
+        "question_count": 24,
+        "purpose": "Xác định mã 2-3 chữ cái để gợi ý nhóm ngành phù hợp sở thích"
+      },
+      {
+        "no": 2,
+        "name": "Tính cách (MBTI rút gọn)",
+        "role": "Chính",
+        "question_count": 16,
+        "purpose": "Bổ trợ RIASEC, làm rõ phong cách làm việc và môi trường phù hợp"
+      }
+    ]
+  },
+
+  "scale": {
+    "type": "likert_5",
+    "min": 1,
+    "max": 5,
+    "labels": [
+      { "value": 1, "label": "Hoàn toàn không đúng" },
+      { "value": 2, "label": "Ít đúng" },
+      { "value": 3, "label": "Trung lập" },
+      { "value": 4, "label": "Khá đúng" },
+      { "value": 5, "label": "Hoàn toàn đúng" }
+    ]
+  },
+
+  "dimensions": {
+    "riasec": {
+      "R": { "name": "Realistic", "name_vi": "Kỹ thuật – Thực tế", "keywords": ["máy móc", "vận động", "thao tác tay", "ngoài trời"] },
+      "I": { "name": "Investigative", "name_vi": "Nghiên cứu – Phân tích", "keywords": ["tư duy logic", "dữ liệu", "khoa học", "giải quyết vấn đề"] },
+      "A": { "name": "Artistic", "name_vi": "Nghệ thuật – Sáng tạo", "keywords": ["thẩm mỹ", "tự do", "biểu đạt", "thiết kế"] },
+      "S": { "name": "Social", "name_vi": "Xã hội – Hỗ trợ", "keywords": ["giao tiếp", "giúp đỡ", "giảng dạy", "đồng cảm"] },
+      "E": { "name": "Enterprising", "name_vi": "Quản lý – Thuyết phục", "keywords": ["lãnh đạo", "kinh doanh", "đàm phán", "chấp nhận rủi ro"] },
+      "C": { "name": "Conventional", "name_vi": "Nghiệp vụ – Tổ chức", "keywords": ["quy trình", "số liệu", "chi tiết", "ổn định"] }
+    },
+    "mbti": {
+      "EI": { "poles": ["E", "I"], "name_vi": "Nguồn năng lượng: Hướng ngoại / Hướng nội" },
+      "SN": { "poles": ["S", "N"], "name_vi": "Tiếp nhận thông tin: Giác quan / Trực giác" },
+      "TF": { "poles": ["T", "F"], "name_vi": "Ra quyết định: Lý trí / Cảm xúc" },
+      "JP": { "poles": ["J", "P"], "name_vi": "Lối sống: Nguyên tắc / Linh hoạt" }
+    }
+  },
+
+  "questions": [
+    { "id": "R01", "order": 1, "section": "riasec", "trait": "R", "text": "Tôi thích tự tay sửa chữa đồ điện, xe cộ hoặc thiết bị trong nhà." },
+    { "id": "R02", "order": 2, "section": "riasec", "trait": "R", "text": "Tôi hứng thú khi lắp ráp, chế tạo mô hình hoặc sản phẩm cụ thể." },
+    { "id": "R03", "order": 3, "section": "riasec", "trait": "R", "text": "Tôi thích công việc ngoài trời, có vận động hơn là ngồi bàn giấy cả ngày." },
+    { "id": "R04", "order": 4, "section": "riasec", "trait": "R", "text": "Tôi thấy thoải mái khi sử dụng máy móc, dụng cụ hoặc thiết bị kỹ thuật." },
+
+    { "id": "I01", "order": 5, "section": "riasec", "trait": "I", "text": "Tôi thường tò mò tìm hiểu nguyên nhân đằng sau các hiện tượng xung quanh." },
+    { "id": "I02", "order": 6, "section": "riasec", "trait": "I", "text": "Tôi thích giải các bài toán khó, câu đố logic hoặc vấn đề hóc búa." },
+    { "id": "I03", "order": 7, "section": "riasec", "trait": "I", "text": "Tôi thích đọc sách khoa học, tài liệu chuyên sâu hoặc xem phim tài liệu." },
+    { "id": "I04", "order": 8, "section": "riasec", "trait": "I", "text": "Tôi thích thu thập, phân tích số liệu và rút ra kết luận từ dữ liệu." },
+
+    { "id": "A01", "order": 9, "section": "riasec", "trait": "A", "text": "Tôi thích vẽ, thiết kế, chụp ảnh hoặc chỉnh sửa hình ảnh, video." },
+    { "id": "A02", "order": 10, "section": "riasec", "trait": "A", "text": "Tôi thích viết truyện, làm thơ, viết kịch bản hoặc sáng tạo nội dung." },
+    { "id": "A03", "order": 11, "section": "riasec", "trait": "A", "text": "Tôi thích chơi nhạc, ca hát, diễn xuất hoặc các hoạt động biểu diễn." },
+    { "id": "A04", "order": 12, "section": "riasec", "trait": "A", "text": "Tôi làm việc hiệu quả nhất trong môi trường tự do, ít khuôn mẫu cứng nhắc." },
+
+    { "id": "S01", "order": 13, "section": "riasec", "trait": "S", "text": "Tôi thích giúp người khác tháo gỡ khó khăn của họ." },
+    { "id": "S02", "order": 14, "section": "riasec", "trait": "S", "text": "Tôi thích hướng dẫn, dạy lại hoặc giải thích cho người khác cùng hiểu." },
+    { "id": "S03", "order": 15, "section": "riasec", "trait": "S", "text": "Tôi thấy vui khi tham gia hoạt động tình nguyện, thiện nguyện, cộng đồng." },
+    { "id": "S04", "order": 16, "section": "riasec", "trait": "S", "text": "Tôi kiên nhẫn lắng nghe và dễ đồng cảm khi người khác chia sẻ chuyện buồn." },
+
+    { "id": "E01", "order": 17, "section": "riasec", "trait": "E", "text": "Tôi thích thuyết phục người khác ủng hộ ý tưởng hoặc kế hoạch của mình." },
+    { "id": "E02", "order": 18, "section": "riasec", "trait": "E", "text": "Tôi thường nhận vai trò nhóm trưởng, tổ chức và phân công công việc." },
+    { "id": "E03", "order": 19, "section": "riasec", "trait": "E", "text": "Tôi hứng thú với kinh doanh, bán hàng hoặc khởi nghiệp." },
+    { "id": "E04", "order": 20, "section": "riasec", "trait": "E", "text": "Tôi sẵn sàng chấp nhận rủi ro và cạnh tranh để đạt mục tiêu lớn." },
+
+    { "id": "C01", "order": 21, "section": "riasec", "trait": "C", "text": "Tôi thích sắp xếp tài liệu, hồ sơ, dữ liệu theo hệ thống rõ ràng." },
+    { "id": "C02", "order": 22, "section": "riasec", "trait": "C", "text": "Tôi làm việc tốt hơn khi có quy trình và hướng dẫn cụ thể." },
+    { "id": "C03", "order": 23, "section": "riasec", "trait": "C", "text": "Tôi cẩn thận, tỉ mỉ với con số, sổ sách và các chi tiết nhỏ." },
+    { "id": "C04", "order": 24, "section": "riasec", "trait": "C", "text": "Tôi thích công việc ổn định, có kế hoạch và lịch trình rõ ràng." },
+
+    { "id": "EI01", "order": 25, "section": "mbti", "dimension": "EI", "pole": "E", "text": "Sau một ngày gặp gỡ nhiều người, tôi thấy hào hứng hơn là kiệt sức." },
+    { "id": "EI02", "order": 26, "section": "mbti", "dimension": "EI", "pole": "E", "text": "Tôi thường chủ động bắt chuyện với người lạ ở nơi đông người." },
+    { "id": "EI03", "order": 27, "section": "mbti", "dimension": "EI", "pole": "I", "text": "Tôi cần khoảng thời gian ở một mình để nạp lại năng lượng." },
+    { "id": "EI04", "order": 28, "section": "mbti", "dimension": "EI", "pole": "I", "text": "Tôi thích suy nghĩ kỹ trong đầu trước khi phát biểu ý kiến." },
+
+    { "id": "SN01", "order": 29, "section": "mbti", "dimension": "SN", "pole": "S", "text": "Tôi tin vào dữ kiện cụ thể và kinh nghiệm thực tế hơn là linh cảm." },
+    { "id": "SN02", "order": 30, "section": "mbti", "dimension": "SN", "pole": "S", "text": "Tôi chú ý đến từng chi tiết cụ thể hơn là bức tranh tổng thể." },
+    { "id": "SN03", "order": 31, "section": "mbti", "dimension": "SN", "pole": "N", "text": "Tôi hay nghĩ về những ý tưởng mới và khả năng có thể xảy ra trong tương lai." },
+    { "id": "SN04", "order": 32, "section": "mbti", "dimension": "SN", "pole": "N", "text": "Tôi thích bàn về khái niệm trừu tượng, ý nghĩa sâu xa đằng sau sự việc." },
+
+    { "id": "TF01", "order": 33, "section": "mbti", "dimension": "TF", "pole": "T", "text": "Khi quyết định, tôi ưu tiên tính hợp lý và công bằng hơn là cảm xúc." },
+    { "id": "TF02", "order": 34, "section": "mbti", "dimension": "TF", "pole": "T", "text": "Tôi có thể góp ý thẳng thắn ngay cả khi điều đó khiến người khác không vui." },
+    { "id": "TF03", "order": 35, "section": "mbti", "dimension": "TF", "pole": "F", "text": "Tôi cân nhắc cảm xúc của mọi người trước khi đưa ra quyết định." },
+    { "id": "TF04", "order": 36, "section": "mbti", "dimension": "TF", "pole": "F", "text": "Tôi dễ bị ảnh hưởng bởi bầu không khí cảm xúc của những người xung quanh." },
+
+    { "id": "JP01", "order": 37, "section": "mbti", "dimension": "JP", "pole": "J", "text": "Tôi thường lập kế hoạch và danh sách việc cần làm trước khi bắt tay vào việc." },
+    { "id": "JP02", "order": 38, "section": "mbti", "dimension": "JP", "pole": "J", "text": "Tôi thấy khó chịu khi công việc dở dang hoặc kế hoạch bị thay đổi phút chót." },
+    { "id": "JP03", "order": 39, "section": "mbti", "dimension": "JP", "pole": "P", "text": "Tôi thích giữ nhiều phương án mở thay vì chốt sớm một lựa chọn." },
+    { "id": "JP04", "order": 40, "section": "mbti", "dimension": "JP", "pole": "P", "text": "Tôi thường làm việc theo cảm hứng và xoay xở tốt khi sát hạn chót." }
+  ],
+
+  "scoring": {
+    "riasec": {
+      "method": "sum_by_trait",
+      "questions_per_trait": 4,
+      "raw_range": { "min": 4, "max": 20 },
+      "normalize": "percent = (raw - 4) / 16 * 100",
+      "holland_code": {
+        "rule": "Sắp xếp 6 nhóm theo điểm giảm dần, lấy 3 nhóm cao nhất theo thứ tự",
+        "tie_break": ["R", "I", "A", "S", "E", "C"],
+        "note": "Nếu nhóm thứ 3 chênh dưới 2 điểm so với nhóm thứ 4, nên hiển thị cả hai như mã thay thế"
+      },
+      "confidence_flag": {
+        "low_differentiation": "Chênh lệch giữa nhóm cao nhất và thấp nhất < 4 điểm → sở thích chưa rõ, nên phỏng vấn bổ sung",
+        "all_low": "Tất cả nhóm < 10 điểm → khả năng trả lời qua loa hoặc thiếu trải nghiệm"
+      }
+    },
+    "mbti": {
+      "method": "compare_poles_per_dimension",
+      "questions_per_pole": 2,
+      "pole_raw_range": { "min": 2, "max": 10 },
+      "rule": "Với mỗi cặp, cộng điểm 2 câu của từng cực; cực có điểm cao hơn là chữ cái kết quả",
+      "tie_rule": "Bằng điểm → gán theo mặc định I / N / F / P và đánh dấu 'không rõ ràng'",
+      "strength": {
+        "formula": "|pole_A - pole_B| / 8 * 100",
+        "levels": [
+          { "range": "0-20", "label": "Rất nhẹ (cân bằng)" },
+          { "range": "21-40", "label": "Nhẹ" },
+          { "range": "41-70", "label": "Rõ" },
+          { "range": "71-100", "label": "Rất rõ" }
+        ]
+      },
+      "output": "Chuỗi 4 chữ cái, ví dụ: INFP, ESTJ"
+    },
+    "combine": {
+      "rule": "RIASEC quyết định NHÓM NGÀNH; MBTI quyết định PHONG CÁCH LÀM VIỆC & MÔI TRƯỜNG phù hợp",
+      "weight_suggestion": { "riasec": 0.7, "mbti": 0.3 },
+      "example": "Mã IRC + INTJ → nhóm ngành phân tích/kỹ thuật, môi trường độc lập, ít giao tiếp cường độ cao"
+    }
+  },
+
+  "validation": {
+    "require_all_answered": true,
+    "straight_lining_check": "Nếu ≥ 90% câu trả lời cùng một giá trị → cảnh báo kết quả không đáng tin",
+    "min_time_seconds": 120
+  }
+}
