@@ -1,6 +1,6 @@
 """
 🧠 CẤP ĐỘ 3: REACTIVE AGENT (ReAct Agent - Thought -> Action -> Observation)
-Agent biết suy nghĩ, tự ra quyết định gọi Tool thực tế và quan sát kết quả để trả lời.
+Sử dụng OpenAI LLM & bộ công cụ trong tools.py.
 """
 
 import json
@@ -8,12 +8,12 @@ import re
 import sys
 import os
 
-# Thêm thư mục src vào sys.path để import được
+# Thêm thư mục src vào sys.path để import các module tools, prompts, providers
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from tools import AVAILABLE_TOOLS
 from prompts import REACT_SYSTEM_PROMPT, MAX_ITERATIONS
-from providers import get_llm_provider
+from providers import OpenAIProvider, get_llm_provider
 
 
 def parse_action(response: str):
@@ -24,25 +24,41 @@ def parse_action(response: str):
     Returns:
         tuple: (tool_name, params) hoặc (None, None) nếu không tìm thấy
     """
-    # Tìm dòng Action:
-    action_match = re.search(r'Action:\s*(\w+)\((.*?)\)', response, re.IGNORECASE)
+    action_match = re.search(r'Action:\s*(\w+)\s*[\(\[]([^\)\]]*)[\)\]]', response, re.IGNORECASE)
     
     if action_match:
-        tool_name = action_match.group(1)
-        params_str = action_match.group(2)
+        tool_name = action_match.group(1).strip()
+        params_str = action_match.group(2).strip()
         
-        # Parse params (xử lý cả string có dấu nháy và số)
         params = []
-        if params_str.strip():
-            # Tách params bằng dấu phẩy (đơn giản hóa)
-            for p in params_str.split(','):
-                p = p.strip().strip('"').strip("'")
-                # Thử convert sang int nếu là số
+        if params_str:
+            # Nếu param là một chuỗi JSON (ví dụ trong calculate_personality_score)
+            if params_str.startswith("{") and params_str.endswith("}"):
+                params = [params_str]
+            else:
+                import csv
+                import io
                 try:
-                    p = int(p)
-                except:
-                    pass
-                params.append(p)
+                    reader = csv.reader(io.StringIO(params_str), skipinitialspace=True)
+                    for row in reader:
+                        for item in row:
+                            item = item.strip().strip("'").strip('"')
+                            try:
+                                item = int(item)
+                            except ValueError:
+                                try:
+                                    item = float(item)
+                                except ValueError:
+                                    pass
+                            params.append(item)
+                except Exception:
+                    for p in params_str.split(','):
+                        p = p.strip().strip('"').strip("'")
+                        try:
+                            p = int(p)
+                        except ValueError:
+                            pass
+                        params.append(p)
         
         return tool_name, params
     
@@ -51,7 +67,7 @@ def parse_action(response: str):
 
 def execute_tool(tool_name: str, params: list):
     """
-    Thực thi tool với tham số đã cho.
+    Thực thi tool từ AVAILABLE_TOOLS trong tools.py với tham số đã cho.
     
     Returns:
         str: Kết quả từ tool hoặc thông báo lỗi
@@ -62,134 +78,126 @@ def execute_tool(tool_name: str, params: list):
     try:
         tool_func = AVAILABLE_TOOLS[tool_name]
         result = tool_func(*params)
-        return result
+        return str(result)
     except TypeError as e:
         return f"❌ Lỗi tham số cho tool '{tool_name}': {str(e)}"
     except Exception as e:
         return f"❌ Lỗi khi thực thi tool '{tool_name}': {str(e)}"
 
 
-def reactive_agent_loop(user_query: str, provider=None, verbose=True):
+def reactive_agent_loop(user_query: str, provider=None, verbose=True, return_details=False):
     """
-    Vòng lặp ReAct Agent chính: Thought -> Action -> Observation
+    Vòng lặp ReAct Agent chính: Thought -> Action -> Observation sử dụng OpenAI
     
     Args:
         user_query: Câu hỏi của người dùng
-        provider: LLM provider (nếu None sẽ dùng provider mặc định từ .env)
-        verbose: Có hiển thị chi tiết từng bước hay không
+        provider: LLM provider (Mặc định dùng OpenAIProvider nếu None)
+        verbose: Hiển thị log trên console
+        return_details: Nếu True, trả về dict chứa {final_answer, steps}
     
     Returns:
-        str: Câu trả lời cuối cùng
+        str hoặc dict: Câu trả lời cuối cùng hoặc dict chi tiết các bước ReAct
     """
     if provider is None:
-        provider = get_llm_provider()
+        provider = OpenAIProvider()
+    elif isinstance(provider, str):
+        provider = get_llm_provider(provider)
     
     if verbose:
         print(f"\n{'='*80}")
-        print(f"🎯 Câu hỏi người dùng: {user_query}")
-        print(f"🤖 Provider đang dùng: {provider.__class__.__name__}")
+        print(f"🎯 [CẤP ĐỘ 3 - REACTIVE AGENT] Câu hỏi: {user_query}")
+        print(f"🤖 Provider: {provider.__class__.__name__}")
         print(f"{'='*80}\n")
     
-    conversation_history = []
-    conversation_history.append(f"User Query: {user_query}")
+    conversation_history = [f"User Query: {user_query}"]
+    steps_log = []
     
     for iteration in range(1, MAX_ITERATIONS + 1):
-        if verbose:
-            print(f"\n{'─'*80}")
-            print(f"🔄 VÒng LẶP {iteration}/{MAX_ITERATIONS}")
-            print(f"{'─'*80}")
-        
-        # Tạo prompt đầy đủ với lịch sử
         full_prompt = "\n\n".join(conversation_history)
         
-        # Gọi LLM
         if verbose:
-            print(f"\n💬 Đang gọi LLM...")
+            print(f"\n--- 🔄 Vòng lặp ReAct (Step {iteration}/{MAX_ITERATIONS}) ---")
+            print(f"💬 Đang gọi OpenAI LLM...")
         
         response = provider.generate(full_prompt, REACT_SYSTEM_PROMPT)
         
         if verbose:
-            print(f"\n🤖 Phản hồi LLM:\n{response}")
+            print(f"🤖 Phản hồi LLM:\n{response}\n")
         
         conversation_history.append(f"Agent Response:\n{response}")
         
+        # Parse Thought từ phản hồi
+        thought_match = re.search(r'Thought:\s*(.*?)(?=\nAction:|\nFinal Answer:|$)', response, re.DOTALL | re.IGNORECASE)
+        thought = thought_match.group(1).strip() if thought_match else response
+        
         # Kiểm tra xem đã có Final Answer chưa
         if "Final Answer:" in response:
-            # Trích xuất Final Answer
             final_answer = response.split("Final Answer:")[-1].strip()
             
-            if verbose:
-                print(f"\n{'='*80}")
-                print(f"✅ ĐÃ CÓ KẾT QUẢ CUỐI CÙNG")
-                print(f"{'='*80}")
-                print(f"\n📝 Final Answer:\n{final_answer}\n")
+            steps_log.append({
+                "step": iteration,
+                "thought": thought,
+                "action": "Final Answer",
+                "observation": final_answer
+            })
             
+            if verbose:
+                print(f"✅ FINAL ANSWER:\n{final_answer}\n")
+            
+            if return_details:
+                return {
+                    "final_answer": final_answer,
+                    "steps": steps_log,
+                    "success": True
+                }
             return final_answer
         
         # Parse Action
         tool_name, params = parse_action(response)
         
         if tool_name is None:
-            if verbose:
-                print(f"\n⚠️ Không tìm thấy Action hợp lệ trong phản hồi. Tiếp tục...")
-            # Thêm prompt nhắc nhở
+            steps_log.append({
+                "step": iteration,
+                "thought": thought,
+                "action": "None",
+                "observation": "Không tìm thấy Action hợp lệ."
+            })
             conversation_history.append("System: Bạn cần chỉ định một Action với định dạng: Action: tool_name(params)")
             continue
         
+        action_str = f"{tool_name}({', '.join(map(repr, params))})"
         if verbose:
-            print(f"\n🛠️ Thực thi Action: {tool_name}({', '.join(map(str, params))})")
+            print(f"🛠️ Thực thi Action: {action_str}")
         
-        # Thực thi tool
         observation = execute_tool(tool_name, params)
         
         if verbose:
-            print(f"\n👁️ Observation (Kết quả từ tool):\n{observation}")
+            print(f"👁️ Observation:\n{observation}")
         
-        # Thêm observation vào lịch sử
+        steps_log.append({
+            "step": iteration,
+            "thought": thought,
+            "action": action_str,
+            "observation": observation
+        })
+        
         conversation_history.append(f"Observation: {observation}")
     
-    # Nếu đã hết số lần lặp mà chưa có Final Answer
-    error_msg = f"⚠️ Đã đạt giới hạn {MAX_ITERATIONS} vòng lặp mà chưa có câu trả lời cuối cùng. Vui lòng thử lại với câu hỏi rõ ràng hơn."
+    error_msg = f"⚠️ Đã đạt giới hạn {MAX_ITERATIONS} vòng lặp ReAct mà chưa có câu trả lời cuối cùng."
     
-    if verbose:
-        print(f"\n{'='*80}")
-        print(error_msg)
-        print(f"{'='*80}\n")
-    
+    if return_details:
+        return {
+            "final_answer": error_msg,
+            "steps": steps_log,
+            "success": False
+        }
     return error_msg
 
 
-def test_reactive_agent():
-    """Test function cho ReAct Agent"""
-    print("\n" + "="*80)
-    print("🧪 TEST REACTIVE AGENT - TƯ VẤN ĐỊNH HƯỚNG SỰ NGHIỆP")
-    print("="*80)
-    
-    # Test case 1: Hỏi về tổ hợp môn
-    test_queries = [
-        "Em học khối A00 (Toán, Lý, Hóa), các ngành nào phù hợp với em?",
-        "Em muốn biết thông tin về ngành Công nghệ thông tin",
-        "Em có ngân sách 50 triệu/năm, muốn học CNTT ở Miền Bắc thì có trường nào phù hợp?",
-    ]
-    
-    for i, query in enumerate(test_queries, 1):
-        print(f"\n\n{'#'*80}")
-        print(f"TEST CASE {i}")
-        print(f"{'#'*80}")
-        
-        result = reactive_agent_loop(query, verbose=True)
-        
-        print(f"\n📊 KẾT QUẢ TEST CASE {i}:")
-        print(f"Câu hỏi: {query}")
-        print(f"Trả lời: {result}")
-        
-        print(f"\n{'─'*80}\n")
-        
-        # Chỉ test 1 case để không mất thời gian
-        break
-
-
 if __name__ == "__main__":
-    # Chạy test
-    test_reactive_agent()
-
+    print("=== DEMO CẤP ĐỘ 3: REACTIVE AGENT (OPENAI + TOOLS) ===")
+    provider = OpenAIProvider()
+    query = "Em học khối A00, tư vấn cho em các ngành phù hợp và thông tin ngành Công nghệ thông tin?"
+    res = reactive_agent_loop(query, provider=provider, verbose=True, return_details=True)
+    print("\n[RESULT]:")
+    print(res["final_answer"])
