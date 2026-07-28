@@ -2,52 +2,145 @@
     {
         "name": "Đại học Bách Khoa Hà Nội",
         "region": "Miền Bắc",
-        "majors": [
-            "CNTT",
-            "Kỹ thuật",
-            "Cơ điện tử"
-        ],
+        "majors": ["CNTT", "Kỹ thuật", "Cơ điện tử"],
         "tuition_year": 30000000
     },
     {
         "name": "Đại học Kinh tế Quốc dân",
         "region": "Miền Bắc",
-        "majors": [
-            "Kinh tế",
-            "Marketing",
-            "Kế toán"
-        ],
+        "majors": ["Kinh tế", "Marketing", "Kế toán", "Quản trị kinh doanh"],
         "tuition_year": 25000000
     },
     {
-        "name": "Đại học FPT",
-        "region": "Toàn quốc",
-        "majors": [
-            "CNTT",
-            "Marketing",
-            "Ngôn ngữ"
-        ],
-        "tuition_year": 90000000
+        "name": "Đại học Ngoại thương (Hà Nội)",
+        "region": "Miền Bắc",
+        "majors": ["Kinh doanh quốc tế", "Kinh tế", "Ngôn ngữ"],
+        "tuition_year": 25000000
+    },
+    {
+        "name": "Đại học Y Hà Nội",
+        "region": "Miền Bắc",
+        "majors": ["Y khoa", "Dược học", "Điều dưỡng", "Răng hàm mặt"],
+        "tuition_year": 45000000
+    },
+    {
+        "name": "Đại học Quốc gia Hà Nội",
+        "region": "Miền Bắc",
+        "majors": ["Đa ngành", "CNTT", "Ngôn ngữ", "Sư phạm", "Khoa học cơ bản"],
+        "tuition_year": 25000000
+    },
+    {
+        "name": "Học viện Báo chí và Tuyên truyền",
+        "region": "Miền Bắc",
+        "majors": ["Báo chí", "Truyền thông", "Quan hệ công chúng"],
+        "tuition_year": 22000000
+    },
+    {
+        "name": "Đại học Bách khoa - Đại học Đà Nẵng",
+        "region": "Miền Trung",
+        "majors": ["Kỹ thuật", "CNTT", "Cơ khí", "Xây dựng"],
+        "tuition_year": 25000000
+    },
+    {
+        "name": "Đại học Kinh tế - Đại học Đà Nẵng",
+        "region": "Miền Trung",
+        "majors": ["Kinh tế", "Marketing", "Tài chính"],
+        "tuition_year": 22000000
+    },
+    {
+        "name": "Đại học Y Dược Huế",
+        "region": "Miền Trung",
+        "majors": ["Y khoa", "Dược học", "Điều dưỡng"],
+        "tuition_year": 40000000
+    },
+    {
+        "name": "Đại học Ngoại ngữ - Đại học Huế",
+        "region": "Miền Trung",
+        "majors": ["Ngôn ngữ Anh", "Ngôn ngữ Trung", "Ngôn ngữ Hàn"],
+        "tuition_year": 18000000
     },
     {
         "name": "Đại học Khoa học Tự nhiên TP.HCM",
         "region": "Miền Nam",
-        "majors": [
-            "CNTT",
-            "Khoa học dữ liệu",
-            "Sinh học"
-        ],
+        "majors": ["CNTT", "Khoa học dữ liệu", "Sinh học", "Toán học"],
         "tuition_year": 28000000
+    },
+    {
+        "name": "Đại học Y Dược TP.HCM",
+        "region": "Miền Nam",
+        "majors": ["Y khoa", "Dược học", "Răng hàm mặt"],
+        "tuition_year": 50000000
+    },
+    {
+        "name": "Đại học Kinh tế TP.HCM (UEH)",
+        "region": "Miền Nam",
+        "majors": ["Kinh tế", "Marketing", "Tài chính", "Thương mại điện tử"],
+        "tuition_year": 30000000
+    },
+    {
+        "name": "Đại học Ngoại thương (Cơ sở II TP.HCM)",
+        "region": "Miền Nam",
+        "majors": ["Kinh doanh quốc tế", "Kinh tế", "Marketing"],
+        "tuition_year": 25000000
+    },
+    {
+        "name": "Đại học Sư phạm kỹ thuật TP.HCM",
+        "region": "Miền Nam",
+        "majors": ["Kỹ thuật", "Cơ điện tử", "Công nghệ ô tô", "Tự động hóa"],
+        "tuition_year": 22000000
+    },
+    {
+        "name": "Đại học Khoa học Xã hội và Nhân văn TP.HCM",
+        "region": "Miền Nam",
+        "majors": ["Báo chí", "Ngôn ngữ", "Tâm lý học", "Du lịch"],
+        "tuition_year": 22000000
+    },
+    {
+        "name": "Đại học Công nghệ TP.HCM (HUTECH)",
+        "region": "Miền Nam",
+        "majors": ["Đa ngành", "Kinh tế", "CNTT", "Truyền thông", "Thiết kế thời trang"],
+        "tuition_year": 45000000
+    },
+    {
+        "name": "Đại học Tôn Đức Thắng",
+        "region": "Miền Nam",
+        "majors": ["Đa ngành", "Kinh tế", "CNTT", "Thiết kế đồ họa"],
+        "tuition_year": 35000000
+    },
+    {
+        "name": "Đại học Quốc tế - ĐHQG TP.HCM",
+        "region": "Miền Nam",
+        "majors": ["Kinh doanh quốc tế", "Logistics", "CNTT"],
+        "tuition_year": 50000000
+    },
+    {
+        "name": "Đại học Luật TP.HCM",
+        "region": "Miền Nam",
+        "majors": ["Luật học", "Luật thương mại quốc tế", "Quản trị luật"],
+        "tuition_year": 30000000
+    },
+    {
+        "name": "Đại học FPT",
+        "region": "Toàn quốc",
+        "majors": ["CNTT", "Marketing", "Ngôn ngữ", "Thiết kế đồ họa"],
+        "tuition_year": 90000000
     },
     {
         "name": "RMIT Việt Nam",
         "region": "Toàn quốc",
-        "majors": [
-            "Kinh tế",
-            "Truyền thông",
-            "IT",
-            "Marketing"
-        ],
+        "majors": ["Kinh tế", "Truyền thông", "IT", "Marketing", "Thiết kế"],
         "tuition_year": 320000000
+    },
+    {
+        "name": "Đại học VinUni",
+        "region": "Toàn quốc",
+        "majors": ["Y khoa", "Kinh doanh", "Kỹ thuật", "Khoa học máy tính"],
+        "tuition_year": 800000000
+    },
+    {
+        "name": "Đại học Swinburne Việt Nam",
+        "region": "Toàn quốc",
+        "majors": ["IT", "Kinh doanh", "Truyền thông"],
+        "tuition_year": 100000000
     }
 ]
