@@ -116,7 +116,7 @@
       "actual_result": "",
       "status": "Chưa thực hiện"
     },
-    {
+    {  
       "test_case_id": "TC-008",
       "module": "02. Trắc nghiệm Tính cách & RIASEC",
       "test_type": "Chức năng",
