@@ -2,6 +2,8 @@
 🛠️ TOOL REGISTRY & SCHEMAS (Dành cho Role 2: Tool & Spec Engineer)
 Nơi khai báo tất cả các "món đồ nghề" mà ReAct Agent có thể gọi.
 """
+import os
+import json
 from typing import Optional
 
 def major_matching(subject_group: str) -> str:
@@ -16,14 +18,14 @@ def major_matching(subject_group: str) -> str:
     """
     subject_group = subject_group.strip().upper()
     
-    # Mock data cơ bản
-    mapping = {
-        "A00": "Toán, Lý, Hóa: Phù hợp với Kỹ thuật, CNTT, Khoa học dữ liệu, Cơ điện tử, Logistics.",
-        "A01": "Toán, Lý, Anh: Phù hợp với CNTT, Kinh tế, Quản trị kinh doanh, Marketing, Khoa học máy tính.",
-        "B00": "Toán, Hóa, Sinh: Phù hợp với Y dược, Công nghệ sinh học, Khoa học môi trường, Nông nghiệp.",
-        "C00": "Văn, Sử, Địa: Phù hợp với Báo chí, Luật, Sư phạm, Du lịch, Tâm lý học.",
-        "D01": "Toán, Văn, Anh: Phù hợp với Ngôn ngữ, Kinh tế, Truyền thông, Quan hệ quốc tế, Quản trị nhân sự."
-    }
+    # Read from config
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(os.path.dirname(current_dir), "config", "major_mapping.json")
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            mapping = json.load(f)
+    except Exception as e:
+        return f"Lỗi đọc dữ liệu tổ hợp môn: {e}"
     
     if subject_group in mapping:
         return f"Với tổ hợp {subject_group}, các nhóm ngành gợi ý: {mapping[subject_group]}"
@@ -43,27 +45,15 @@ def career_database_search(career_name: str) -> str:
     """
     career_name_lower = career_name.lower()
     
-    # Mock data cho một số ngành
-    careers = {
-        "công nghệ thông tin": {
-            "mo_ta": "Lập trình, thiết kế, phát triển và bảo trì phần mềm, hệ thống mạng.",
-            "ky_nang": "Tư duy logic, học hỏi nhanh, tiếng Anh tốt, kiên trì.",
-            "muc_luong": "Mới ra trường: 10-15 triệu/tháng. Kinh nghiệm 3-5 năm: 25-50 triệu/tháng.",
-            "trien_vong": "Rất cao trong 5-10 năm tới."
-        },
-        "marketing": {
-            "mo_ta": "Nghiên cứu thị trường, xây dựng chiến lược quảng cáo, PR, quản lý thương hiệu.",
-            "ky_nang": "Sáng tạo, giao tiếp tốt, nhạy bén với xu hướng, phân tích dữ liệu.",
-            "muc_luong": "Mới ra trường: 8-12 triệu/tháng. Quản lý: 20-40 triệu/tháng.",
-            "trien_vong": "Nhu cầu luôn cao ở mọi lĩnh vực kinh doanh."
-        },
-        "logistics": {
-            "mo_ta": "Quản lý chuỗi cung ứng, vận tải, kho bãi, xuất nhập khẩu.",
-            "ky_nang": "Lập kế hoạch, giải quyết vấn đề, giao tiếp ngoại ngữ, cẩn thận.",
-            "muc_luong": "Mới ra trường: 9-14 triệu/tháng. Trưởng phòng: 25-45 triệu/tháng.",
-            "trien_vong": "Ngành công nghiệp đang bùng nổ nhờ thương mại điện tử."
-        }
-    }
+    # Read from json file
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(os.path.dirname(current_dir), "config", "careers.json")
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            careers = json.load(f)
+    except Exception as e:
+        return f"Lỗi đọc dữ liệu ngành nghề: {e}"
     
     for key, info in careers.items():
         if key in career_name_lower or career_name_lower in key:
@@ -75,7 +65,7 @@ def career_database_search(career_name: str) -> str:
                 f"- Triển vọng: {info['trien_vong']}"
             )
             
-    return f"Chưa tìm thấy dữ liệu chi tiết cho ngành '{career_name}'. Bạn thử các ngành như: Công nghệ thông tin, Marketing, Logistics..."
+    return f"Chưa tìm thấy dữ liệu chi tiết cho ngành '{career_name}'. Bạn thử tìm kiếm theo từ khóa chung hơn."
 
 
 def university_search(major: str, region: str = "Toàn quốc", max_tuition: int = 100000000) -> str:
@@ -90,14 +80,14 @@ def university_search(major: str, region: str = "Toàn quốc", max_tuition: int
     Returns:
         str: Danh sách các trường đại học thỏa mãn tiêu chí.
     """
-    # Mock data trường học
-    universities = [
-        {"name": "Đại học Bách Khoa Hà Nội", "region": "Miền Bắc", "majors": ["CNTT", "Kỹ thuật", "Cơ điện tử"], "tuition_year": 30000000},
-        {"name": "Đại học Kinh tế Quốc dân", "region": "Miền Bắc", "majors": ["Kinh tế", "Marketing", "Kế toán"], "tuition_year": 25000000},
-        {"name": "Đại học FPT", "region": "Toàn quốc", "majors": ["CNTT", "Marketing", "Ngôn ngữ"], "tuition_year": 90000000},
-        {"name": "Đại học Khoa học Tự nhiên TP.HCM", "region": "Miền Nam", "majors": ["CNTT", "Khoa học dữ liệu", "Sinh học"], "tuition_year": 28000000},
-        {"name": "RMIT Việt Nam", "region": "Toàn quốc", "majors": ["Kinh tế", "Truyền thông", "IT", "Marketing"], "tuition_year": 320000000},
-    ]
+    # Read from config
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(os.path.dirname(current_dir), "config", "universities.json")
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            universities = json.load(f)
+    except Exception as e:
+        return f"Lỗi đọc dữ liệu trường học: {e}"
     
     results = []
     major_lower = major.lower()

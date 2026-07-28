@@ -1,0 +1,182 @@
+{
+    "công nghệ thông tin": {
+        "mo_ta": "Lập trình, thiết kế, phát triển và bảo trì phần mềm, hệ thống mạng.",
+        "ky_nang": "Tư duy logic, học hỏi nhanh, tiếng Anh tốt, kiên trì.",
+        "muc_luong": "Mới ra trường: 10-15 triệu/tháng. Kinh nghiệm 3-5 năm: 25-50 triệu/tháng.",
+        "trien_vong": "Rất cao trong 5-10 năm tới."
+    },
+    "marketing": {
+        "mo_ta": "Nghiên cứu thị trường, xây dựng chiến lược quảng cáo, PR, quản lý thương hiệu.",
+        "ky_nang": "Sáng tạo, giao tiếp tốt, nhạy bén với xu hướng, phân tích dữ liệu.",
+        "muc_luong": "Mới ra trường: 8-12 triệu/tháng. Quản lý: 20-40 triệu/tháng.",
+        "trien_vong": "Nhu cầu luôn cao ở mọi lĩnh vực kinh doanh."
+    },
+    "logistics": {
+        "mo_ta": "Quản lý chuỗi cung ứng, vận tải, kho bãi, xuất nhập khẩu.",
+        "ky_nang": "Lập kế hoạch, giải quyết vấn đề, giao tiếp ngoại ngữ, cẩn thận.",
+        "muc_luong": "Mới ra trường: 9-14 triệu/tháng. Trưởng phòng: 25-45 triệu/tháng.",
+        "trien_vong": "Ngành công nghiệp đang bùng nổ nhờ thương mại điện tử."
+    },
+    "kế toán": {
+        "mo_ta": "Ghi chép, thu thập, xử lý và báo cáo thông tin tài chính của doanh nghiệp.",
+        "ky_nang": "Cẩn thận, trung thực, logic, sử dụng tốt phần mềm excel.",
+        "muc_luong": "Mới ra trường: 7-10 triệu/tháng. Kế toán trưởng: 25-50 triệu/tháng.",
+        "trien_vong": "Ngành nghề ổn định, doanh nghiệp nào cũng cần."
+    },
+    "tài chính ngân hàng": {
+        "mo_ta": "Quản trị rủi ro tài chính, tín dụng, thanh toán quốc tế tại các ngân hàng.",
+        "ky_nang": "Nhạy bén với con số, giao tiếp, phân tích tài chính.",
+        "muc_luong": "Mới ra trường: 10-15 triệu/tháng. Cấp quản lý: 30-70 triệu/tháng.",
+        "trien_vong": "Nhu cầu nhân sự chất lượng cao về quản trị rủi ro."
+    },
+    "quản trị kinh doanh": {
+        "mo_ta": "Tổ chức, điều hành và quản lý các hoạt động kinh doanh của doanh nghiệp.",
+        "ky_nang": "Lãnh đạo, giải quyết vấn đề, giao tiếp, tư duy tổng hợp.",
+        "muc_luong": "Mới ra trường: 8-12 triệu/tháng. Giám đốc: 50-100+ triệu/tháng.",
+        "trien_vong": "Rất linh hoạt, có thể làm việc ở nhiều phòng ban."
+    },
+    "y khoa": {
+        "mo_ta": "Khám chữa bệnh, nghiên cứu y học, chăm sóc sức khỏe cộng đồng.",
+        "ky_nang": "Chịu áp lực cực cao, học tập không ngừng, nhân ái, cẩn trọng.",
+        "muc_luong": "Mới ra trường: 8-15 triệu/tháng. Bác sĩ giỏi/Phòng khám riêng: >100 triệu/tháng.",
+        "trien_vong": "Vô cùng bền vững, nhu cầu chăm sóc sức khỏe ngày càng tăng."
+    },
+    "dược học": {
+        "mo_ta": "Nghiên cứu, sản xuất, kiểm nghiệm và phân phối các loại thuốc.",
+        "ky_nang": "Cẩn thận, trí nhớ tốt, giỏi hóa sinh.",
+        "muc_luong": "Mới ra trường: 10-15 triệu/tháng. Trình dược viên: 20-50 triệu/tháng.",
+        "trien_vong": "Ngành công nghiệp dược phẩm đang phát triển mạnh."
+    },
+    "điều dưỡng": {
+        "mo_ta": "Chăm sóc bệnh nhân, theo dõi tình trạng sức khỏe, hỗ trợ bác sĩ.",
+        "ky_nang": "Chu đáo, kiên nhẫn, chịu khó, sức khỏe tốt.",
+        "muc_luong": "Mới ra trường: 7-12 triệu/tháng. Tu nghiệp nước ngoài: 40-70 triệu/tháng.",
+        "trien_vong": "Đang thiếu hụt nhân lực trầm trọng trong và ngoài nước."
+    },
+    "ngôn ngữ anh": {
+        "mo_ta": "Biên phiên dịch, giảng dạy tiếng Anh, làm việc tại công ty đa quốc gia.",
+        "ky_nang": "Giao tiếp, truyền đạt, am hiểu văn hóa.",
+        "muc_luong": "Mới ra trường: 9-15 triệu/tháng. Kinh nghiệm: 20-40 triệu/tháng.",
+        "trien_vong": "Nền tảng vững chắc, linh hoạt áp dụng nhiều nghề."
+    },
+    "luật": {
+        "mo_ta": "Tư vấn pháp lý, giải quyết tranh chấp, soạn thảo hợp đồng.",
+        "ky_nang": "Lập luận logic, giao tiếp, trí nhớ tốt, tư duy phản biện.",
+        "muc_luong": "Mới ra trường: 8-12 triệu/tháng. Luật sư kinh nghiệm: 30-100+ triệu/tháng.",
+        "trien_vong": "Nhu cầu tư vấn pháp lý doanh nghiệp tăng mạnh."
+    },
+    "thiết kế đồ họa": {
+        "mo_ta": "Sử dụng phần mềm tạo ra các sản phẩm hình ảnh, video, banner quảng cáo.",
+        "ky_nang": "Sáng tạo, thẩm mỹ, sử dụng phần mềm (PS, AI, PR).",
+        "muc_luong": "Mới ra trường: 9-15 triệu/tháng. Lead Designer: 25-50 triệu/tháng.",
+        "trien_vong": "Không bao giờ hết hot trong kỷ nguyên digital marketing."
+    },
+    "kiến trúc": {
+        "mo_ta": "Thiết kế không gian, quy hoạch các công trình nhà ở, đô thị.",
+        "ky_nang": "Tư duy không gian, sáng tạo, kiến thức toán lý.",
+        "muc_luong": "Mới ra trường: 10-15 triệu/tháng. Kiến trúc sư trưởng: 40-80 triệu/tháng.",
+        "trien_vong": "Ngành xây dựng, bất động sản cần nhiều nhân lực thiết kế."
+    },
+    "du lịch": {
+        "mo_ta": "Hướng dẫn viên, điều hành tour, thiết kế chương trình du lịch.",
+        "ky_nang": "Giao tiếp, ngoại ngữ, xử lý tình huống, hoạt bát.",
+        "muc_luong": "Mới ra trường: 8-15 triệu/tháng. HDV quốc tế: 30-60 triệu/tháng.",
+        "trien_vong": "Phục hồi và phát triển mạnh sau đại dịch."
+    },
+    "quản trị khách sạn": {
+        "mo_ta": "Quản lý phòng, dịch vụ ăn uống, tổ chức sự kiện tại khách sạn/resort.",
+        "ky_nang": "Khéo léo, giao tiếp, ngoại ngữ, chịu áp lực.",
+        "muc_luong": "Mới ra trường: 7-12 triệu/tháng. Quản lý cấp cao: 40-100 triệu/tháng.",
+        "trien_vong": "Cơ hội thăng tiến rõ ràng ở các tập đoàn đa quốc gia."
+    },
+    "công nghệ sinh học": {
+        "mo_ta": "Nghiên cứu ứng dụng sinh học vào y dược, nông nghiệp, thực phẩm.",
+        "ky_nang": "Nghiên cứu, phân tích, tư duy logic, cẩn thận.",
+        "muc_luong": "Mới ra trường: 9-14 triệu/tháng. Chuyên gia: 30-60 triệu/tháng.",
+        "trien_vong": "Ngành mũi nhọn của thế kỷ 21."
+    },
+    "công nghệ thực phẩm": {
+        "mo_ta": "Nghiên cứu sản phẩm mới, kiểm tra chất lượng vệ sinh an toàn thực phẩm.",
+        "ky_nang": "Cẩn thận, kiến thức hóa sinh, nhạy cảm mùi vị.",
+        "muc_luong": "Mới ra trường: 8-13 triệu/tháng. QA/QC Manager: 25-45 triệu/tháng.",
+        "trien_vong": "Ngành thiết yếu, độ ổn định cao."
+    },
+    "tâm lý học": {
+        "mo_ta": "Nghiên cứu tư duy, hành vi con người; tham vấn tâm lý, HR.",
+        "ky_nang": "Lắng nghe, thấu cảm, phân tích, giao tiếp.",
+        "muc_luong": "Mới ra trường: 8-15 triệu/tháng. Chuyên gia tư vấn: 30-50+ triệu/tháng.",
+        "trien_vong": "Đang trở thành xu hướng mới khi con người quan tâm sức khỏe tinh thần."
+    },
+    "truyền thông đa phương tiện": {
+        "mo_ta": "Sản xuất video, podcast, quản trị mạng xã hội, tổ chức sự kiện.",
+        "ky_nang": "Sáng tạo, đa năng, cập nhật xu hướng nhanh.",
+        "muc_luong": "Mới ra trường: 9-15 triệu/tháng. Producer: 30-60 triệu/tháng.",
+        "trien_vong": "Nhu cầu sản xuất nội dung số bùng nổ."
+    },
+    "công nghệ ô tô": {
+        "mo_ta": "Thiết kế, chế tạo, bảo trì, sửa chữa các loại xe ô tô.",
+        "ky_nang": "Thực hành tốt, yêu thích máy móc, sức khỏe, tư duy logic.",
+        "muc_luong": "Mới ra trường: 8-14 triệu/tháng. Kỹ sư chuyên sâu: 25-50 triệu/tháng.",
+        "trien_vong": "Thị trường ô tô VN đang bước vào giai đoạn bùng nổ."
+    },
+    "kỹ thuật điện điện tử": {
+        "mo_ta": "Thiết kế, bảo trì hệ thống điện, thiết bị điện tử, vi mạch.",
+        "ky_nang": "Toán lý tốt, cẩn thận, tư duy logic, giải quyết vấn đề.",
+        "muc_luong": "Mới ra trường: 10-15 triệu/tháng. Kỹ sư vi mạch: 30-80 triệu/tháng.",
+        "trien_vong": "Đặc biệt hot ở mảng thiết kế vi mạch, bán dẫn."
+    },
+    "cơ điện tử": {
+        "mo_ta": "Kết hợp cơ khí, điện tử và tin học để chế tạo robot, hệ thống tự động.",
+        "ky_nang": "Tư duy hệ thống, sáng tạo, giỏi toán lý tin.",
+        "muc_luong": "Mới ra trường: 10-16 triệu/tháng. Kỹ sư tự động hóa: 30-60 triệu/tháng.",
+        "trien_vong": "Cốt lõi của cách mạng công nghiệp 4.0."
+    },
+    "thương mại điện tử": {
+        "mo_ta": "Kinh doanh trên mạng internet, quản trị sàn TMĐT, digital marketing.",
+        "ky_nang": "Nhạy bén xu hướng, phân tích data, xử lý vấn đề.",
+        "muc_luong": "Mới ra trường: 9-15 triệu/tháng. Quản lý sàn: 30-70 triệu/tháng.",
+        "trien_vong": "Tiếp tục tăng trưởng hai con số mỗi năm."
+    },
+    "khoa học dữ liệu": {
+        "mo_ta": "Phân tích số liệu lớn (Big Data) để tìm ra insight kinh doanh, xây mô hình AI.",
+        "ky_nang": "Toán học siêu tốt, lập trình (Python/R), tư duy thống kê.",
+        "muc_luong": "Mới ra trường: 15-25 triệu/tháng. Senior Data Scientist: 50-100 triệu/tháng.",
+        "trien_vong": "Ngành 'sexy' nhất thế kỷ 21, cực kỳ khát nhân lực giỏi."
+    },
+    "sư phạm": {
+        "mo_ta": "Giảng dạy, truyền đạt kiến thức tại các trường học, trung tâm.",
+        "ky_nang": "Thấu hiểu, truyền đạt, kiên nhẫn, đam mê giáo dục.",
+        "muc_luong": "Mới ra trường: 7-12 triệu/tháng. Giáo viên giỏi/Dạy thêm: 30-80 triệu/tháng.",
+        "trien_vong": "Ổn định, được xã hội trọng vọng."
+    },
+    "quan hệ công chúng": {
+        "mo_ta": "Xây dựng, bảo vệ và duy trì hình ảnh tốt đẹp cho tổ chức, xử lý khủng hoảng.",
+        "ky_nang": "Giao tiếp xuất chúng, ngoại giao, giải quyết vấn đề, viết lách.",
+        "muc_luong": "Mới ra trường: 9-14 triệu/tháng. PR Manager: 30-60 triệu/tháng.",
+        "trien_vong": "Nhu cầu cao ở các doanh nghiệp lớn, nghệ sĩ."
+    },
+    "báo chí": {
+        "mo_ta": "Thu thập, phân tích thông tin, viết bài, sản xuất tin tức.",
+        "ky_nang": "Nhạy bén thông tin, viết lách, dũng cảm, khách quan.",
+        "muc_luong": "Mới ra trường: 7-12 triệu/tháng. Nhà báo có tên tuổi: 20-50 triệu/tháng.",
+        "trien_vong": "Đang chuyển đổi số mạnh mẽ sang báo chí đa phương tiện."
+    },
+    "quản trị nhân sự": {
+        "mo_ta": "Tuyển dụng, đào tạo, quản lý phúc lợi và đánh giá nhân viên (HR).",
+        "ky_nang": "Thấu hiểu tâm lý, giao tiếp, quản trị rủi ro, khéo léo.",
+        "muc_luong": "Mới ra trường: 8-12 triệu/tháng. Giám đốc nhân sự (CHRO): 50-100+ triệu/tháng.",
+        "trien_vong": "Doanh nghiệp nào cũng cần bộ phận HR vững mạnh."
+    },
+    "thiết kế thời trang": {
+        "mo_ta": "Sáng tạo các mẫu quần áo, phụ kiện, bắt kịp hoặc tạo ra xu hướng.",
+        "ky_nang": "Sáng tạo, tư duy thẩm mỹ, vẽ tay, am hiểu chất liệu.",
+        "muc_luong": "Mới ra trường: 8-15 triệu/tháng. Sở hữu brand riêng: Thu nhập không giới hạn.",
+        "trien_vong": "Cạnh tranh rất cao nhưng cũng rất tiềm năng nếu tạo được khác biệt."
+    },
+    "nông nghiệp công nghệ cao": {
+        "mo_ta": "Ứng dụng khoa học công nghệ vào lai tạo, trồng trọt, chăn nuôi năng suất cao.",
+        "ky_nang": "Yêu thiên nhiên, chịu khó, kiến thức sinh học, công nghệ.",
+        "muc_luong": "Mới ra trường: 8-15 triệu/tháng. Kỹ sư trưởng: 25-50 triệu/tháng.",
+        "trien_vong": "Đang được nhà nước ưu tiên đầu tư phát triển."
+    }
+}
